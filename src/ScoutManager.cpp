@@ -128,17 +128,15 @@ void ScoutManager::moveScouts()
     if (!enemyBaseLocation)
     {
         m_scoutStatus = "Enemy base unknown, exploring";
-
         for (const BaseLocation * startLocation : m_bot.Bases().getStartingBaseLocations())
         {
             // if we haven't explored it yet then scout it out
             // TODO: this is where we could change the order of the base scouting, since right now it's iterator order
-            if (!m_bot.Map().isExplored(startLocation->getPosition()))
-            {
+            if (!startLocation->isExplored()) {
                 m_scoutUnit.move(startLocation->getPosition());
                 return;
             }
-        }
+        } 
     }
 
     m_previousScoutHP = scoutHP;

@@ -1,5 +1,6 @@
 #include "SassySpecterBot.h"
 #include "Util.h"
+#include <iostream>
 
 SassySpecterBot::SassySpecterBot()
     : m_map(*this)

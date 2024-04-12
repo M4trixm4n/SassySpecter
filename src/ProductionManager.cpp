@@ -130,7 +130,9 @@ void ProductionManager::fixBuildOrderDeadlock()
         }
     }
 
-    if (!hasProducer)
+    // Don't enter the loop when a ZERG_LARVA is needed, game knows when one is needed but
+    // not when one is created, creating a deadlock
+    if (!hasProducer && m_bot.Data(currentItem.type).whatBuilds[0].getName() != "ZERG_LARVA")
     {
         m_queue.queueAsHighestPriority(MetaType(m_bot.Data(currentItem.type).whatBuilds[0], m_bot), true);
         fixBuildOrderDeadlock();

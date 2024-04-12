@@ -62,7 +62,7 @@ int main(int argc, char* argv[])
     SassySpecterBot bot;
 
     
-    // WARNING: Bot logic has not been thorougly tested on step sizes > 1
+    // WARNING: Bot logic has not been thoroughly tested on step sizes > 1
     //          Setting this = N means the bot's onFrame gets called once every N frames
     //          The bot may crash or do unexpected things if its logic is not called every frame
     coordinator.SetStepSize(stepSize);
