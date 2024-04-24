@@ -17,6 +17,20 @@ SassySpecterBot::SassySpecterBot()
 void SassySpecterBot::OnGameStart() 
 {
     m_config.readConfigFile();
+    //for (auto &unit : Observation()->GetUnitTypeData()) {
+    //    if (unit.movement_speed == 0) continue;
+    //    std::cout << unit.name << " : " << std::endl;
+    //    std::cout << "Disponible : " << (unit.available ? "oui" : "non") << std::endl;
+    //    std::cout << "Race : " << unit.race << std::endl;
+    //    std::cout << "Cout : " << unit.mineral_cost << "  " << unit.vespene_cost << "  " << unit.food_required << "  " << unit.build_time << std::endl;
+    //    std::cout << "Attributes : \n";
+    //    for (auto &att : unit.attributes) {
+    //        std::cout << static_cast<int>(att) << std::endl;
+    //    }
+    //    std::cout << "Movement Speed : " << unit.movement_speed << std::endl;
+    //    std::cout << "Requirements : " << unit.tech_requirement << std::endl;
+    //    std::cout << "Requirement is an add-on : " << unit.require_attached << std::endl;
+    //}
 
     // add all the possible start locations on the map
 #ifdef SC2API

@@ -66,4 +66,5 @@ public:
     bool isEgg() const;
     bool isQueen() const;
     bool isTank() const;
+    sc2::AbilityID warpAbility() const;
 };

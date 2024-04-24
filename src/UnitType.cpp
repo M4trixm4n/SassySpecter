@@ -268,7 +268,15 @@ int UnitType::tileHeight() const
 bool UnitType::isAddon() const
 {
 #ifdef SC2API
-    return m_bot->Data(*this).isAddon;
+    switch (m_type.ToType()) {
+        case sc2::UNIT_TYPEID::TERRAN_BARRACKSREACTOR:
+        case sc2::UNIT_TYPEID::TERRAN_BARRACKSTECHLAB:
+        case sc2::UNIT_TYPEID::TERRAN_FACTORYREACTOR:
+        case sc2::UNIT_TYPEID::TERRAN_FACTORYTECHLAB:
+        case sc2::UNIT_TYPEID::TERRAN_STARPORTREACTOR:
+        case sc2::UNIT_TYPEID::TERRAN_STARPORTTECHLAB: return true;
+        default: return false;
+    }
 #else
     return m_type.isAddon();
 #endif
@@ -277,7 +285,10 @@ bool UnitType::isAddon() const
 bool UnitType::isBuilding() const
 {
 #ifdef SC2API
-    return m_bot->Data(*this).isBuilding;
+    for (auto &attr : m_bot->Observation()->GetUnitTypeData()[m_type].attributes) {
+        if (attr == sc2::Attribute::Structure) return true;
+    }
+    return false;
 #else
     return m_type.isBuilding();
 #endif
@@ -402,3 +413,26 @@ bool UnitType::isMorphedBuilding() const
             m_type == BWAPI::UnitTypes::Zerg_Greater_Spire;
 #endif
 }
+
+sc2::AbilityID UnitType::warpAbility () const {
+    switch (m_type.ToType()) {
+        case sc2::UNIT_TYPEID::PROTOSS_ADEPT: return sc2::ABILITY_ID::TRAINWARP_ADEPT;
+        case sc2::UNIT_TYPEID::PROTOSS_DARKTEMPLAR: return sc2::ABILITY_ID::TRAINWARP_DARKTEMPLAR;
+        case sc2::UNIT_TYPEID::PROTOSS_HIGHTEMPLAR: return sc2::ABILITY_ID::TRAINWARP_HIGHTEMPLAR;
+        case sc2::UNIT_TYPEID::PROTOSS_SENTRY: return sc2::ABILITY_ID::TRAINWARP_SENTRY;
+        case sc2::UNIT_TYPEID::PROTOSS_STALKER: return sc2::ABILITY_ID::TRAINWARP_STALKER;
+        case sc2::UNIT_TYPEID::PROTOSS_ZEALOT: return sc2::ABILITY_ID::TRAINWARP_ZEALOT;
+        default: return 0;
+    }
+}
+
+const std::vector<UnitType> & UnitType::whatBuilds() const {
+    using namespace sc2;
+    switch (m_type.ToType()) {
+        case UNIT_TYPEID::PROTOSS_ASSIMILATOR:
+            return {UnitType(UNIT_TYPEID::PROTOSS_PROBE, *m_bot)};
+        default:
+            return {};
+    }
+}
+
