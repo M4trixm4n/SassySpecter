@@ -56,7 +56,7 @@ public:
     int mineralPrice() const;
     int gasPrice() const;
 
-    const std::vector<UnitType> & whatBuilds() const;
+    std::vector<UnitType> whatBuilds() const;
 
     static UnitType GetUnitTypeFromName(const std::string & name, SassySpecterBot & bot);
 
@@ -66,5 +66,7 @@ public:
     bool isEgg() const;
     bool isQueen() const;
     bool isTank() const;
+
     sc2::AbilityID warpAbility() const;
+    bool equivalentBuilding () const; //checks if the building is equivalent to another (and thus just copied later)
 };

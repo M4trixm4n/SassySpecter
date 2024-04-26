@@ -38,8 +38,8 @@ public:
 
     mutable SassySpecterBot *m_bot;                 // bot for units
 
-    UnitType unitA{0, *m_bot};                      // first unit type
-    UnitType unitB{0, *m_bot};                      // second unit type
+    UnitType unitA;                      // first unit type
+    UnitType unitB;                      // second unit type
 
     int currentUnitACounter{0};                     // Number of Unit As for current test
     int currentUnitBCounter{0};                     // Number of Unit Bs for current test
@@ -47,8 +47,8 @@ public:
     Timer timer;                                    // Timer started at first attack, stopped after a unit type was eradicated
 
     std::vector<SkirmishResult> results;            // Contains the result for every test for current units
-    std::vector<std::vector<double>> finalMatrix;   // Contains every final ratio between units, calculated with the SkiimishResults
-    std::vector<sc2::UNIT_TYPEID> unitList;
+    std::vector<std::vector<double>> finalMatrix;   // Contains every final ratio between units, calculated with the SkirmishResults
+    std::vector<UnitType> unitList;
 
     bool cycleUnits ();                             // Switches Units to a new combination (not done before)
     bool cycleCounters ();                          // Switches Counters to a new combination
@@ -59,5 +59,5 @@ public:
     void resetGameState ();                         // Restarts the game if needed (i.e. race change)
     bool skipUselessMatchup () const;               // Skips useless matchups (i.e. 2 passive units, 2 incompatible units, etc.)
     void addFinalRatios ();                         // Calculate final ratios between 2 units with results and adds them to finalMatrix
-
+    UnitMatrix (std::vector<UnitType> unitList, SassySpecterBot *m_bot);
 };

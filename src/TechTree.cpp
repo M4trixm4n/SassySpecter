@@ -22,14 +22,13 @@ void TechTree::onStart()
 void TechTree::initUnitTypeData()
 {
     const sc2::UnitTypes types{m_bot.Observation()->GetUnitTypeData()};
-    std::cout << "Link name : " << m_bot.Observation()->GetAbilityData()[static_cast<int>(sc2::ABILITY_ID::TRAIN_HELLION)].link_name << std::endl;
-    std::cout << "Link index : " << m_bot.Observation()->GetAbilityData()[static_cast<int>(sc2::ABILITY_ID::TRAIN_HELLION)].link_index << std::endl;
-    for (auto i = 1; i < 111; i++) {
+    for (auto i = 1; i < 2000; i++) {
         auto tmp = static_cast<sc2::UNIT_TYPEID>(i);
         auto ut = UnitType(tmp, m_bot);
         if (ut.getName() == "UNKNOWN") continue;
         auto unit{types[ut.getAPIUnitType()]};
         //std::cout << "Adding : " << ut.getName() << " : " << unit.tech_requirement << " !\n";
+        if (ut.equivalentBuilding()) continue;
         m_unitTypeData[ut] = {
             unit.race,
             unit.mineral_cost, 
@@ -45,533 +44,46 @@ void TechTree::initUnitTypeData()
             ut.isAddon(),
             unit.ability_id, 
             ut.warpAbility(),
-            ut.whatBuilds(), //TODO asked on discord
+            ut.whatBuilds(),
             {UnitType(unit.tech_requirement, m_bot)},
             {}  //TODO
         };
     }
     m_unitTypeData[UnitType(0, m_bot)] = TypeData();
 
+    //    Missing whatBuilds case for this unit type : 892
+    //    Missing whatBuilds case for this unit type : 893
+    //    Missing whatBuilds case for this unit type : 894
+
     // Protoss Buildings 
 
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::PROTOSS_ASSIMILATOR, m_bot)] = {
-        sc2::Race::Protoss,
-        75, 0, 0, 21,
-        true, true, false, true, false, false, false,
-        sc2::ABILITY_ID::BUILD_ASSIMILATOR, 0,
-        {UnitType(sc2::UNIT_TYPEID::PROTOSS_PROBE, m_bot)},
-        {},
-        {}
-    };
-
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::PROTOSS_CYBERNETICSCORE, m_bot)] = {
-        sc2::Race::Protoss,
-        150, 0, 0, 36,
-        true, true, false, false, false, false, false,
-        sc2::ABILITY_ID::BUILD_CYBERNETICSCORE, 0,
-        {UnitType(sc2::UNIT_TYPEID::PROTOSS_PROBE, m_bot)},
-        {
-            UnitType(sc2::UNIT_TYPEID::PROTOSS_GATEWAY, m_bot),
-            UnitType(sc2::UNIT_TYPEID::PROTOSS_WARPGATE, m_bot)
-        },
-        {}
-    };
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::PROTOSS_DARKSHRINE, m_bot)] = {
-        sc2::Race::Protoss,
-        150, 150, 0, 71,
-        true, true, false, false, false, false, false,
-        sc2::ABILITY_ID::BUILD_DARKSHRINE, 0,
-        {UnitType(sc2::UNIT_TYPEID::PROTOSS_PROBE, m_bot)},
-        {UnitType(sc2::UNIT_TYPEID::PROTOSS_TWILIGHTCOUNCIL, m_bot)},
-        {}
-    };
-
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::PROTOSS_FLEETBEACON, m_bot)] =             { 
-        sc2::Race::Protoss, 
-        300, 200, 0, 43, 
-        true, true, false, false, false, false, false, 
-        sc2::ABILITY_ID::BUILD_FLEETBEACON, 0, 
-        {UnitType(sc2::UNIT_TYPEID::PROTOSS_PROBE, m_bot)}, 
-        {UnitType(sc2::UNIT_TYPEID::PROTOSS_STARGATE, m_bot)}, 
-        {} 
-    };
-
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::PROTOSS_FORGE, m_bot)] =                   { 
-        sc2::Race::Protoss, 
-        150, 0, 0, 32, 
-        true, true, false, false, false, false, false, 
-        sc2::ABILITY_ID::BUILD_FORGE, 0, 
-        { UnitType(sc2::UNIT_TYPEID::PROTOSS_PROBE, m_bot) }, 
-        { UnitType(sc2::UNIT_TYPEID::PROTOSS_NEXUS, m_bot) }, 
-        {} 
-    };
-
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::PROTOSS_GATEWAY, m_bot)] =                 { 
-        sc2::Race::Protoss, 
-        150, 0, 0, 46, 
-        true, true, false, false, false, false, false, 
-        sc2::ABILITY_ID::BUILD_GATEWAY, 0, 
-        { UnitType(sc2::UNIT_TYPEID::PROTOSS_PROBE, m_bot) }, 
-        { UnitType(sc2::UNIT_TYPEID::PROTOSS_NEXUS, m_bot) }, 
-        {} 
-    };
-
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::PROTOSS_NEXUS, m_bot)] =                   { 
-        sc2::Race::Protoss, 
-        400, 0, 0, 71, 
-        true, true, false, false, false,  true, false, 
-        sc2::ABILITY_ID::BUILD_NEXUS, 0, 
-        { UnitType(sc2::UNIT_TYPEID::PROTOSS_PROBE, m_bot) }, 
-        {}, 
-        {} 
-    }; 
-
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::PROTOSS_PHOTONCANNON, m_bot)] =            { 
-        sc2::Race::Protoss, 
-        150, 0, 0, 29, 
-        true, true, false, false, false, false, false, 
-        sc2::ABILITY_ID::BUILD_PHOTONCANNON, 0, 
-        { UnitType(sc2::UNIT_TYPEID::PROTOSS_PROBE, m_bot) }, 
-        { UnitType(sc2::UNIT_TYPEID::PROTOSS_FORGE, m_bot) }, 
-        {} 
-    };
-
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::PROTOSS_PYLON, m_bot)] =                   { 
-        sc2::Race::Protoss, 
-        100, 0, -8, 18, 
-        true, true, false, false,  true, false, false, 
-        sc2::ABILITY_ID::BUILD_PYLON, 0, 
-        { UnitType(sc2::UNIT_TYPEID::PROTOSS_PROBE, m_bot) }, 
-        {}, 
-        {} 
-    }; 
-
-    // seulement dans LotV, à voir si ne pas l'avoir ici pose problème
-    //m_unitTypeData[UnitType(sc2::UNIT_TYPEID::PROTOSS_PYLONOVERCHARGED, m_bot)] =        { sc2::Race::Protoss, 0, 0, 0, 0, true, true, false, false,  true, false, false, sc2::ABILITY_ID::EFFECT_PHOTONOVERCHARGE, 0, { UnitType(sc2::UNIT_TYPEID::PROTOSS_MOTHERSHIPCORE, m_bot), UnitType(sc2::UNIT_TYPEID::PROTOSS_PYLON, m_bot) }, {}, {} }; 
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::PROTOSS_ROBOTICSBAY, m_bot)] =             { 
-        sc2::Race::Protoss, 
-        150, 150, 0, 46, 
-        true, true, false, false, false, false, false, 
-        sc2::ABILITY_ID::BUILD_ROBOTICSBAY, 0, 
-        { UnitType(sc2::UNIT_TYPEID::PROTOSS_PROBE, m_bot) }, 
-        { UnitType(sc2::UNIT_TYPEID::PROTOSS_ROBOTICSFACILITY, m_bot) }, 
-        {} 
-    };
-
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::PROTOSS_ROBOTICSFACILITY, m_bot)] =        { 
-        sc2::Race::Protoss, 
-        150, 100, 0, 46, 
-        true, true, false, false, false, false, false, 
-        sc2::ABILITY_ID::BUILD_ROBOTICSFACILITY, 0, 
-        { UnitType(sc2::UNIT_TYPEID::PROTOSS_PROBE, m_bot) }, 
-        { UnitType(sc2::UNIT_TYPEID::PROTOSS_CYBERNETICSCORE, m_bot) }, 
-        {} 
-    };
-
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::PROTOSS_STARGATE, m_bot)] =                { 
-        sc2::Race::Protoss, 
-        150, 150, 0, 43, 
-        true, true, false, false, false, false, false, 
-        sc2::ABILITY_ID::BUILD_STARGATE, 0, 
-        { UnitType(sc2::UNIT_TYPEID::PROTOSS_PROBE, m_bot) }, 
-        { UnitType(sc2::UNIT_TYPEID::PROTOSS_CYBERNETICSCORE, m_bot) }, 
-        {} 
-    }; 
-
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::PROTOSS_TEMPLARARCHIVE, m_bot)] =          { 
-        sc2::Race::Protoss, 
-        150, 200, 0, 36, 
-        true, true, false, false, false, false, false,
-        sc2::ABILITY_ID::BUILD_TEMPLARARCHIVE, 0, 
-        { UnitType(sc2::UNIT_TYPEID::PROTOSS_PROBE, m_bot) }, 
-        { UnitType(sc2::UNIT_TYPEID::PROTOSS_TWILIGHTCOUNCIL, m_bot) }, 
-        {}
-    };
-
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::PROTOSS_TWILIGHTCOUNCIL, m_bot)] =         { 
-        sc2::Race::Protoss, 
-        150, 100, 0, 36, 
-        true, true, false, false, false, false, false, 
-        sc2::ABILITY_ID::BUILD_TWILIGHTCOUNCIL, 0, 
-        { UnitType(sc2::UNIT_TYPEID::PROTOSS_PROBE, m_bot) }, 
-        { UnitType(sc2::UNIT_TYPEID::PROTOSS_CYBERNETICSCORE, m_bot) }, 
-        {} 
-    };
-
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::PROTOSS_WARPGATE, m_bot)] =                { 
-        sc2::Race::Protoss, 
-        0, 0, 0, 7, 
-        true, true, false, false, false, false, false, 
-        sc2::ABILITY_ID::MORPH_WARPGATE, 0, 
-        { UnitType(sc2::UNIT_TYPEID::PROTOSS_GATEWAY, m_bot) }, 
-        {}, 
-        { sc2::UPGRADE_ID::WARPGATERESEARCH } 
-    }; 
 
     // Protoss Units  
-
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::PROTOSS_ADEPT, m_bot)] =                   { 
-        sc2::Race::Protoss,
-        100, 25, 2, 30, 
-        true, false, false, false, false, false, false, 
-        sc2::ABILITY_ID::TRAIN_ADEPT, sc2::ABILITY_ID::TRAINWARP_ADEPT,       
-        { 
-            UnitType(sc2::UNIT_TYPEID::PROTOSS_GATEWAY, m_bot), 
-            UnitType(sc2::UNIT_TYPEID::PROTOSS_WARPGATE, m_bot) 
-        },
-        { UnitType(sc2::UNIT_TYPEID::PROTOSS_CYBERNETICSCORE, m_bot) }, 
-        {} 
-    };
-
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::PROTOSS_ARCHON, m_bot)] =                  { 
-        sc2::Race::Protoss, 
-        0, 0, 4, 9, 
-        true, false, false, false, false, false, false, 
-        sc2::ABILITY_ID::MORPH_ARCHON, 0,                                      
-        { 
-            UnitType(sc2::UNIT_TYPEID::PROTOSS_HIGHTEMPLAR, m_bot), 
-            UnitType(sc2::UNIT_TYPEID::PROTOSS_DARKTEMPLAR, m_bot) 
-        }, 
-        { 
-            UnitType(sc2::UNIT_TYPEID::PROTOSS_HIGHTEMPLAR, m_bot), 
-            UnitType(sc2::UNIT_TYPEID::PROTOSS_DARKTEMPLAR, m_bot) 
-        }, 
-        {}
-    };
-
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::PROTOSS_CARRIER, m_bot)] =                 { 
-        sc2::Race::Protoss, 
-        350, 250, 6, 64, 
-        true, false, false, false, false, false, false, 
-        sc2::ABILITY_ID::TRAIN_CARRIER, 0,                                      
-        { UnitType(sc2::UNIT_TYPEID::PROTOSS_STARGATE, m_bot) },                                                            
-        { UnitType(sc2::UNIT_TYPEID::PROTOSS_FLEETBEACON, m_bot) }, 
-        {} 
-    };
-
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::PROTOSS_COLOSSUS, m_bot)] =                { 
-        sc2::Race::Protoss, 
-        300, 200, 6, 54, 
-        true, false, false, false, false, false, false, 
-        sc2::ABILITY_ID::TRAIN_COLOSSUS, 0,                                      
-        { UnitType(sc2::UNIT_TYPEID::PROTOSS_ROBOTICSFACILITY, m_bot) },                                                    
-        { UnitType(sc2::UNIT_TYPEID::PROTOSS_ROBOTICSBAY, m_bot) }, 
-        {} 
-    };
-
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::PROTOSS_DARKTEMPLAR, m_bot)] =             { 
-        sc2::Race::Protoss, 
-        125, 125, 2, 29, 
-        true, false, false, false, false, false, false, 
-        sc2::ABILITY_ID::TRAIN_DARKTEMPLAR, sc2::ABILITY_ID::TRAINWARP_DARKTEMPLAR, 
-        { 
-            UnitType(sc2::UNIT_TYPEID::PROTOSS_GATEWAY, m_bot), 
-            UnitType(sc2::UNIT_TYPEID::PROTOSS_WARPGATE, m_bot) 
-        },                                                             
-        { UnitType(sc2::UNIT_TYPEID::PROTOSS_DARKSHRINE, m_bot) }, 
-        {} 
-    };
-
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::PROTOSS_DISRUPTOR, m_bot)] =               { 
-        sc2::Race::Protoss, 
-        150, 150, 4, 36, 
-        true, false, false, false, false, false, false, 
-        sc2::ABILITY_ID::TRAIN_DISRUPTOR, 0,                                      
-        { UnitType(sc2::UNIT_TYPEID::PROTOSS_ROBOTICSFACILITY, m_bot) },                                                    
-        { UnitType(sc2::UNIT_TYPEID::PROTOSS_ROBOTICSBAY, m_bot) }, 
-        {} 
-    };
-
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::PROTOSS_HIGHTEMPLAR, m_bot)] =             { 
-        sc2::Race::Protoss, 
-        50, 150, 2, 39, 
-        true, false, false, false, false, false, false, 
-        sc2::ABILITY_ID::TRAIN_HIGHTEMPLAR, sc2::ABILITY_ID::TRAINWARP_HIGHTEMPLAR, 
-        { 
-            UnitType(sc2::UNIT_TYPEID::PROTOSS_GATEWAY, m_bot), 
-            UnitType(sc2::UNIT_TYPEID::PROTOSS_WARPGATE, m_bot) 
-        },                                                             
-        { UnitType(sc2::UNIT_TYPEID::PROTOSS_TEMPLARARCHIVE, m_bot) }, 
-        {} 
-    };
-
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::PROTOSS_IMMORTAL, m_bot)] =                { 
-        sc2::Race::Protoss, 
-        275, 100, 4, 39, 
-        true, false, false, false, false, false, false, 
-        sc2::ABILITY_ID::TRAIN_IMMORTAL, 0,                                      
-        { UnitType(sc2::UNIT_TYPEID::PROTOSS_ROBOTICSFACILITY, m_bot) },                                                    
-        {}, 
-        {} 
-    };
-
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::PROTOSS_INTERCEPTOR, m_bot)] =             { 
-        sc2::Race::Protoss, 
-        15, 0, 0, 9, 
-        true, false, false, false, false, false, false, 
-        sc2::ABILITY_ID::BUILD_INTERCEPTORS, 0,                                      
-        { UnitType(sc2::UNIT_TYPEID::PROTOSS_CARRIER, m_bot) },                                                             
-        {}, 
-        {} 
-    };
-
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::PROTOSS_MOTHERSHIP, m_bot)] =              { 
-        sc2::Race::Protoss, 
-        300,300, 6, 89, 
-        true, false, false, false, false, false, false, 
-        sc2::ABILITY_ID::MORPH_MOTHERSHIP, 0,                                      
-        { UnitType(sc2::UNIT_TYPEID::PROTOSS_NEXUS, m_bot) },                                                               
-        { UnitType(sc2::UNIT_TYPEID::PROTOSS_FLEETBEACON, m_bot) }, 
-        {} 
-    };
-
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::PROTOSS_MOTHERSHIPCORE, m_bot)] =          { 
-        sc2::Race::Protoss, 
-        100, 100, 2, 21, 
-        true, false, false, false, false, false, false, 
-        sc2::ABILITY_ID::TRAIN_MOTHERSHIPCORE, 0,                                      
-        { UnitType(sc2::UNIT_TYPEID::PROTOSS_NEXUS, m_bot) },                                                               
-        { UnitType(sc2::UNIT_TYPEID::PROTOSS_CYBERNETICSCORE, m_bot) }, 
-        {} 
-    };
-
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::PROTOSS_OBSERVER, m_bot)] =                { 
-        sc2::Race::Protoss, 
-        25, 75, 1, 18, 
-        true, false, false, false, false, false, false, 
-        sc2::ABILITY_ID::TRAIN_OBSERVER, 0,                                      
-        { UnitType(sc2::UNIT_TYPEID::PROTOSS_ROBOTICSFACILITY, m_bot) },                                                    
-        {}, 
-        {} 
-    };
-
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::PROTOSS_ORACLE, m_bot)] =                  { 
-        sc2::Race::Protoss, 
-        150, 150, 3, 37, 
-        true, false, false, false, false, false, false, 
-        sc2::ABILITY_ID::TRAIN_ORACLE, 0,                                      
-        { UnitType(sc2::UNIT_TYPEID::PROTOSS_STARGATE, m_bot) },                                                            
-        {}, 
-        {} 
-    };
-
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::PROTOSS_ORACLESTASISTRAP, m_bot)] =        { 
-        sc2::Race::Protoss, 
-        0, 0, 0, 5, 
-        true, false, false, false, false, false, false, 
-        sc2::ABILITY_ID::BUILD_STASISTRAP, 0,                                      
-        { UnitType(sc2::UNIT_TYPEID::PROTOSS_ORACLE, m_bot) },                                                              
-        {}, 
-        {} 
-    };
-
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::PROTOSS_PHOENIX, m_bot)] =                 { 
-        sc2::Race::Protoss, 
-        150, 100, 2, 25, 
-        true, false, false, false, false, false, false, 
-        sc2::ABILITY_ID::TRAIN_PHOENIX, 0,                                      
-        { UnitType(sc2::UNIT_TYPEID::PROTOSS_STARGATE, m_bot) },                                                            
-        {}, 
-        {} 
-    };
-
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::PROTOSS_PROBE, m_bot)] =                   { 
-        sc2::Race::Protoss, 
-        50, 0, 1, 12, 
-        true, false, true, false, false, false, false, 
-        sc2::ABILITY_ID::TRAIN_PROBE, 0,                                      
-        { UnitType(sc2::UNIT_TYPEID::PROTOSS_NEXUS, m_bot) },                                                               
-        {}, 
-        {} 
-    }; 
-
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::PROTOSS_SENTRY, m_bot)] =                  { 
-        sc2::Race::Protoss, 
-        50, 100, 2, 23, 
-        true, false, false, false, false, false, false, 
-        sc2::ABILITY_ID::TRAIN_SENTRY, sc2::ABILITY_ID::TRAINWARP_SENTRY,      
-        { 
-            UnitType(sc2::UNIT_TYPEID::PROTOSS_GATEWAY, m_bot), 
-            UnitType(sc2::UNIT_TYPEID::PROTOSS_WARPGATE, m_bot) 
-        },                                                             
-        { UnitType(sc2::UNIT_TYPEID::PROTOSS_CYBERNETICSCORE, m_bot) }, 
-        {} 
-    };
-
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::PROTOSS_STALKER, m_bot)] =                 { 
-        sc2::Race::Protoss, 
-        125, 50, 2, 30, 
-        true, false, false, false, false, false, false, 
-        sc2::ABILITY_ID::TRAIN_STALKER, sc2::ABILITY_ID::TRAINWARP_STALKER,     
-        { 
-            UnitType(sc2::UNIT_TYPEID::PROTOSS_GATEWAY, m_bot), 
-            UnitType(sc2::UNIT_TYPEID::PROTOSS_WARPGATE, m_bot)
-        },
-        { UnitType(sc2::UNIT_TYPEID::PROTOSS_CYBERNETICSCORE, m_bot) }, 
-        {} 
-    };
-
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::PROTOSS_TEMPEST, m_bot)] =                 { 
-        sc2::Race::Protoss, 
-        250, 175, 5, 43, 
-        true, false, false, false, false, false, false, 
-        sc2::ABILITY_ID::TRAIN_TEMPEST, 0,                                      
-        { UnitType(sc2::UNIT_TYPEID::PROTOSS_STARGATE, m_bot) },                                                            
-        { UnitType(sc2::UNIT_TYPEID::PROTOSS_FLEETBEACON, m_bot) }, 
-        {} 
-    };
-
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::PROTOSS_VOIDRAY, m_bot)] =                 { 
-        sc2::Race::Protoss, 
-        250, 150, 4, 43, 
-        true, false, false, false, false, false, false, 
-        sc2::ABILITY_ID::TRAIN_VOIDRAY, 0,                                      
-        { UnitType(sc2::UNIT_TYPEID::PROTOSS_STARGATE, m_bot) },                                                            
-        {}, 
-        {} 
-    };
-
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::PROTOSS_WARPPRISM, m_bot)] =               { 
-        sc2::Race::Protoss, 
-        250, 0, 2, 36, 
-        true, false, false, false, false, false, false, 
-        sc2::ABILITY_ID::TRAIN_WARPPRISM, 0,                                      
-        { UnitType(sc2::UNIT_TYPEID::PROTOSS_ROBOTICSFACILITY, m_bot) },                                                    
-        {}, 
-        {} 
-    };
-
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::PROTOSS_ZEALOT, m_bot)] =                  { 
-        sc2::Race::Protoss, 
-        100, 0, 2, 27, 
-        true, false, false, false, false, false, false, 
-        sc2::ABILITY_ID::TRAIN_ZEALOT, sc2::ABILITY_ID::TRAINWARP_ZEALOT,      
-        { 
-            UnitType(sc2::UNIT_TYPEID::PROTOSS_GATEWAY, m_bot), 
-            UnitType(sc2::UNIT_TYPEID::PROTOSS_WARPGATE, m_bot) 
-        },                                                             
-        {}, 
-        {} 
-    };
     
 
-    // Terran Buildings                                                                      m  g  s  t  unit  bld   wrk    rfn    sup    hall   add
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::TERRAN_ARMORY, m_bot)] =                   { sc2::Race::Terran, 0, 0, 0, 0, true, true, false, false, false, false, false, sc2::ABILITY_ID::BUILD_ARMORY, 0, { UnitType(sc2::UNIT_TYPEID::TERRAN_SCV, m_bot) }, { UnitType(sc2::UNIT_TYPEID::TERRAN_FACTORY, m_bot), UnitType(sc2::UNIT_TYPEID::TERRAN_FACTORYFLYING, m_bot) }, {} };
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::TERRAN_BARRACKS, m_bot)] =                 { sc2::Race::Terran, 0, 0, 0, 0, true, true, false, false, false, false, false, sc2::ABILITY_ID::BUILD_BARRACKS, 0, { UnitType(sc2::UNIT_TYPEID::TERRAN_SCV, m_bot) }, { UnitType(sc2::UNIT_TYPEID::TERRAN_SUPPLYDEPOT, m_bot), UnitType(sc2::UNIT_TYPEID::TERRAN_SUPPLYDEPOTLOWERED, m_bot) }, {} }; 
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::TERRAN_BUNKER, m_bot)] =                   { sc2::Race::Terran, 0, 0, 0, 0, true, true, false, false, false, false, false, sc2::ABILITY_ID::BUILD_BUNKER, 0, { UnitType(sc2::UNIT_TYPEID::TERRAN_SCV, m_bot) }, { UnitType(sc2::UNIT_TYPEID::TERRAN_BARRACKS, m_bot), UnitType(sc2::UNIT_TYPEID::TERRAN_BARRACKSFLYING, m_bot) }, {} };
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::TERRAN_COMMANDCENTER, m_bot)] =            { sc2::Race::Terran, 0, 0, 0, 0, true, true, false, false, false,  true, false, sc2::ABILITY_ID::BUILD_COMMANDCENTER, 0, { UnitType(sc2::UNIT_TYPEID::TERRAN_SCV, m_bot) }, {}, {} }; 
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::TERRAN_ENGINEERINGBAY, m_bot)] =           { sc2::Race::Terran, 0, 0, 0, 0, true, true, false, false, false, false, false, sc2::ABILITY_ID::BUILD_ENGINEERINGBAY, 0, { UnitType(sc2::UNIT_TYPEID::TERRAN_SCV, m_bot) }, { UnitType(sc2::UNIT_TYPEID::TERRAN_COMMANDCENTER, m_bot), UnitType(sc2::UNIT_TYPEID::TERRAN_COMMANDCENTERFLYING, m_bot), UnitType(sc2::UNIT_TYPEID::TERRAN_PLANETARYFORTRESS, m_bot), UnitType(sc2::UNIT_TYPEID::TERRAN_ORBITALCOMMAND, m_bot), UnitType(sc2::UNIT_TYPEID::TERRAN_ORBITALCOMMANDFLYING, m_bot) }, {} }; 
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::TERRAN_FACTORY, m_bot)] =                  { sc2::Race::Terran, 0, 0, 0, 0, true, true, false, false, false, false, false, sc2::ABILITY_ID::BUILD_FACTORY, 0, { UnitType(sc2::UNIT_TYPEID::TERRAN_SCV, m_bot) }, { UnitType(sc2::UNIT_TYPEID::TERRAN_BARRACKS, m_bot), UnitType(sc2::UNIT_TYPEID::TERRAN_BARRACKSFLYING, m_bot) }, {} };
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::TERRAN_FUSIONCORE, m_bot)] =               { sc2::Race::Terran, 0, 0, 0, 0, true, true, false, false, false, false, false, sc2::ABILITY_ID::BUILD_FUSIONCORE, 0, { UnitType(sc2::UNIT_TYPEID::TERRAN_SCV, m_bot) }, { UnitType(sc2::UNIT_TYPEID::TERRAN_STARPORT, m_bot), UnitType(sc2::UNIT_TYPEID::TERRAN_STARPORTFLYING, m_bot) }, {} }; 
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::TERRAN_GHOSTACADEMY, m_bot)] =             { sc2::Race::Terran, 0, 0, 0, 0, true, true, false, false, false, false, false, sc2::ABILITY_ID::BUILD_GHOSTACADEMY, 0, { UnitType(sc2::UNIT_TYPEID::TERRAN_SCV, m_bot) }, { UnitType(sc2::UNIT_TYPEID::TERRAN_BARRACKS, m_bot), UnitType(sc2::UNIT_TYPEID::TERRAN_BARRACKSFLYING, m_bot) }, {} };
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::TERRAN_MISSILETURRET, m_bot)] =            { sc2::Race::Terran, 0, 0, 0, 0, true, true, false, false, false, false, false, sc2::ABILITY_ID::BUILD_MISSILETURRET, 0, { UnitType(sc2::UNIT_TYPEID::TERRAN_SCV, m_bot) }, { UnitType(sc2::UNIT_TYPEID::TERRAN_ENGINEERINGBAY, m_bot) }, {} };
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::TERRAN_ORBITALCOMMAND, m_bot)] =           { sc2::Race::Terran, 0, 0, 0, 0, true, true, false, false, false, false, false, sc2::ABILITY_ID::MORPH_ORBITALCOMMAND, 0, { UnitType(sc2::UNIT_TYPEID::TERRAN_COMMANDCENTER, m_bot) }, { UnitType(sc2::UNIT_TYPEID::TERRAN_BARRACKS, m_bot) }, {} }; 
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::TERRAN_PLANETARYFORTRESS, m_bot)] =        { sc2::Race::Terran, 0, 0, 0, 0, true, true, false, false, false, false, false, sc2::ABILITY_ID::MORPH_PLANETARYFORTRESS, 0, { UnitType(sc2::UNIT_TYPEID::TERRAN_COMMANDCENTER, m_bot) }, { UnitType(sc2::UNIT_TYPEID::TERRAN_ENGINEERINGBAY, m_bot) }, {} };
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::TERRAN_REFINERY, m_bot)] =                 { sc2::Race::Terran, 0, 0, 0, 0, true, true, false,  true, false, false, false, sc2::ABILITY_ID::BUILD_REFINERY, 0, { UnitType(sc2::UNIT_TYPEID::TERRAN_SCV, m_bot) }, {}, {} }; 
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::TERRAN_SENSORTOWER, m_bot)] =              { sc2::Race::Terran, 0, 0, 0, 0, true, true, false, false, false, false, false, sc2::ABILITY_ID::BUILD_SENSORTOWER, 0, { UnitType(sc2::UNIT_TYPEID::TERRAN_SCV, m_bot) }, { UnitType(sc2::UNIT_TYPEID::TERRAN_ENGINEERINGBAY, m_bot) }, {} };
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::TERRAN_STARPORT, m_bot)] =                 { sc2::Race::Terran, 0, 0, 0, 0, true, true, false, false, false, false, false, sc2::ABILITY_ID::BUILD_STARPORT, 0, { UnitType(sc2::UNIT_TYPEID::TERRAN_SCV, m_bot) }, { UnitType(sc2::UNIT_TYPEID::TERRAN_FACTORY, m_bot), UnitType(sc2::UNIT_TYPEID::TERRAN_FACTORYFLYING, m_bot) }, {} };
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::TERRAN_SUPPLYDEPOT, m_bot)] =              { sc2::Race::Terran, 0, 0, 0, 0, true, true, false, false,  true, false, false, sc2::ABILITY_ID::BUILD_SUPPLYDEPOT, 0, { UnitType(sc2::UNIT_TYPEID::TERRAN_SCV, m_bot) }, {}, {} };  
+    // Terran Buildings
+  
 
-    // Terran Addons                                                                         m  g  s  t  unit  bld   wrk    rfn    sup    hall   add
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::TERRAN_BARRACKSREACTOR, m_bot)] =          { sc2::Race::Terran, 0, 0, 0, 0, true, true, false, false, false, false, true, sc2::ABILITY_ID::BUILD_REACTOR_BARRACKS, 0, { UnitType(sc2::UNIT_TYPEID::TERRAN_BARRACKS, m_bot) }, {}, {} };
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::TERRAN_BARRACKSTECHLAB, m_bot)] =          { sc2::Race::Terran, 0, 0, 0, 0, true, true, false, false, false, false, true, sc2::ABILITY_ID::BUILD_TECHLAB_BARRACKS, 0, { UnitType(sc2::UNIT_TYPEID::TERRAN_BARRACKS, m_bot) }, {}, {} };
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::TERRAN_FACTORYREACTOR, m_bot)] =           { sc2::Race::Terran, 0, 0, 0, 0, true, true, false, false, false, false, true, sc2::ABILITY_ID::BUILD_REACTOR_FACTORY, 0, { UnitType(sc2::UNIT_TYPEID::TERRAN_FACTORY, m_bot) }, {}, {} };
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::TERRAN_FACTORYTECHLAB, m_bot)] =           { sc2::Race::Terran, 0, 0, 0, 0, true, true, false, false, false, false, true, sc2::ABILITY_ID::BUILD_TECHLAB_FACTORY, 0, { UnitType(sc2::UNIT_TYPEID::TERRAN_FACTORY, m_bot) }, {}, {} };
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::TERRAN_STARPORTREACTOR, m_bot)] =          { sc2::Race::Terran, 0, 0, 0, 0, true, true, false, false, false, false, true, sc2::ABILITY_ID::BUILD_REACTOR_STARPORT, 0, { UnitType(sc2::UNIT_TYPEID::TERRAN_STARPORT, m_bot) }, {}, {} };
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::TERRAN_STARPORTTECHLAB, m_bot)] =          { sc2::Race::Terran, 0, 0, 0, 0, true, true, false, false, false, false, true, sc2::ABILITY_ID::BUILD_TECHLAB_STARPORT, 0, { UnitType(sc2::UNIT_TYPEID::TERRAN_STARPORT, m_bot) }, {}, {} };
+    // Terran Addons                                     
+
 
     // Terran Equivalent Buildings
     m_unitTypeData[UnitType(sc2::UNIT_TYPEID::TERRAN_BARRACKSFLYING, m_bot)] =           m_unitTypeData[UnitType(sc2::UNIT_TYPEID::TERRAN_BARRACKS, m_bot)];
     m_unitTypeData[UnitType(sc2::UNIT_TYPEID::TERRAN_COMMANDCENTERFLYING, m_bot)] =      m_unitTypeData[UnitType(sc2::UNIT_TYPEID::TERRAN_COMMANDCENTER, m_bot)];
     m_unitTypeData[UnitType(sc2::UNIT_TYPEID::TERRAN_FACTORYFLYING, m_bot)] =            m_unitTypeData[UnitType(sc2::UNIT_TYPEID::TERRAN_FACTORY, m_bot)];
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::TERRAN_ORBITALCOMMANDFLYING, m_bot)] =     m_unitTypeData[UnitType(sc2::UNIT_TYPEID::TERRAN_ORBITALCOMMAND, m_bot)];
     m_unitTypeData[UnitType(sc2::UNIT_TYPEID::TERRAN_STARPORTFLYING, m_bot)] =           m_unitTypeData[UnitType(sc2::UNIT_TYPEID::TERRAN_STARPORT, m_bot)];
     m_unitTypeData[UnitType(sc2::UNIT_TYPEID::TERRAN_SUPPLYDEPOTLOWERED, m_bot)] =       m_unitTypeData[UnitType(sc2::UNIT_TYPEID::TERRAN_SUPPLYDEPOT, m_bot)];
 
-    // Terran Units                                                                          m  g  s  t  unit  bld    wrk    rfn    sup    hall   add
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::TERRAN_AUTOTURRET, m_bot)] =               { sc2::Race::Terran, 0, 0, 0, 0, true, false, false, false, false, false, false, sc2::ABILITY_ID::EFFECT_AUTOTURRET, 0, { UnitType(sc2::UNIT_TYPEID::TERRAN_RAVEN, m_bot) }, {}, {} }; 
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::TERRAN_BANSHEE, m_bot)] =                  { sc2::Race::Terran, 0, 0, 3, 0, true, false, false, false, false, false, false, sc2::ABILITY_ID::TRAIN_BANSHEE, 0, { UnitType(sc2::UNIT_TYPEID::TERRAN_STARPORT, m_bot) }, { UnitType(sc2::UNIT_TYPEID::TERRAN_TECHLAB, m_bot), UnitType(sc2::UNIT_TYPEID::TERRAN_BARRACKSTECHLAB, m_bot), UnitType(sc2::UNIT_TYPEID::TERRAN_FACTORYTECHLAB, m_bot), UnitType(sc2::UNIT_TYPEID::TERRAN_STARPORTTECHLAB, m_bot) }, {} };
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::TERRAN_BATTLECRUISER, m_bot)] =            { sc2::Race::Terran, 0, 0, 6, 0, true, false, false, false, false, false, false, sc2::ABILITY_ID::TRAIN_BATTLECRUISER, 0, { UnitType(sc2::UNIT_TYPEID::TERRAN_STARPORT, m_bot) }, {}, {} }; 
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::TERRAN_CYCLONE, m_bot)] =                  { sc2::Race::Terran, 0, 0, 3, 0, true, false, false, false, false, false, false, sc2::ABILITY_ID::TRAIN_CYCLONE, 0, { UnitType(sc2::UNIT_TYPEID::TERRAN_FACTORY, m_bot) }, {}, {} };  
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::TERRAN_GHOST, m_bot)] =                    { sc2::Race::Terran, 0, 0, 2, 0, true, false, false, false, false, false, false, sc2::ABILITY_ID::TRAIN_GHOST, 0, { UnitType(sc2::UNIT_TYPEID::TERRAN_BARRACKS, m_bot) }, {}, {} }; 
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::TERRAN_HELLION, m_bot)] =                  { sc2::Race::Terran, 0, 0, 2, 0, true, false, false, false, false, false, false, sc2::ABILITY_ID::TRAIN_HELLION, 0, { UnitType(sc2::UNIT_TYPEID::TERRAN_FACTORY, m_bot) }, {}, {} }; 
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::TERRAN_HELLIONTANK, m_bot)] =              { sc2::Race::Terran, 0, 0, 0, 0, true, false, false, false, false, false, false, sc2::ABILITY_ID::MORPH_HELLBAT, 0, { UnitType(sc2::UNIT_TYPEID::TERRAN_HELLION, m_bot) }, {}, {}};
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::TERRAN_LIBERATOR, m_bot)] =                { sc2::Race::Terran, 0, 0, 3, 0, true, false, false, false, false, false, false, sc2::ABILITY_ID::TRAIN_LIBERATOR, 0, { UnitType(sc2::UNIT_TYPEID::TERRAN_STARPORT, m_bot) }, {}, {} }; 
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::TERRAN_MARAUDER, m_bot)] =                 { sc2::Race::Terran, 0, 0, 2, 0, true, false, false, false, false, false, false, sc2::ABILITY_ID::TRAIN_MARAUDER, 0, { UnitType(sc2::UNIT_TYPEID::TERRAN_BARRACKS, m_bot) }, { UnitType(sc2::UNIT_TYPEID::TERRAN_TECHLAB, m_bot), UnitType(sc2::UNIT_TYPEID::TERRAN_BARRACKSTECHLAB, m_bot), UnitType(sc2::UNIT_TYPEID::TERRAN_FACTORYTECHLAB, m_bot), UnitType(sc2::UNIT_TYPEID::TERRAN_STARPORTTECHLAB, m_bot) }, {} };
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::TERRAN_MARINE, m_bot)] =                   { sc2::Race::Terran, 0, 0, 1, 0, true, false, false, false, false, false, false, sc2::ABILITY_ID::TRAIN_MARINE, 0, { UnitType(sc2::UNIT_TYPEID::TERRAN_BARRACKS, m_bot) }, {}, {} };
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::TERRAN_MEDIVAC, m_bot)] =                  { sc2::Race::Terran, 0, 0, 2, 0, true, false, false, false, false, false, false, sc2::ABILITY_ID::TRAIN_MEDIVAC, 0, { UnitType(sc2::UNIT_TYPEID::TERRAN_STARPORT, m_bot) }, {}, {} };
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::TERRAN_MULE, m_bot)] =                     { sc2::Race::Terran, 0, 0, 0, 0, true, false, false, false, false, false, false, sc2::ABILITY_ID::EFFECT_CALLDOWNMULE, 0, { UnitType(sc2::UNIT_TYPEID::TERRAN_ORBITALCOMMAND, m_bot) }, {}, {} }; 
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::TERRAN_NUKE, m_bot)] =                     { sc2::Race::Terran, 0, 0, 0, 0, true, false, false, false, false, false, false, sc2::ABILITY_ID::BUILD_NUKE, 0, { UnitType(sc2::UNIT_TYPEID::TERRAN_GHOSTACADEMY, m_bot) }, {}, {} }; 
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::TERRAN_POINTDEFENSEDRONE, m_bot)] =        { sc2::Race::Terran, 0, 0, 0, 0, true, false, false, false, false, false, false, sc2::ABILITY_ID::EFFECT_POINTDEFENSEDRONE, 0, { UnitType(sc2::UNIT_TYPEID::TERRAN_RAVEN, m_bot) }, {}, {}};
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::TERRAN_RAVEN, m_bot)] =                    { sc2::Race::Terran, 0, 0, 2, 0, true, false, false, false, false, false, false, sc2::ABILITY_ID::TRAIN_RAVEN, 0, { UnitType(sc2::UNIT_TYPEID::TERRAN_STARPORT, m_bot) }, { UnitType(sc2::UNIT_TYPEID::TERRAN_TECHLAB, m_bot), UnitType(sc2::UNIT_TYPEID::TERRAN_BARRACKSTECHLAB, m_bot), UnitType(sc2::UNIT_TYPEID::TERRAN_FACTORYTECHLAB, m_bot), UnitType(sc2::UNIT_TYPEID::TERRAN_STARPORTTECHLAB, m_bot) }, {} };
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::TERRAN_REAPER, m_bot)] =                   { sc2::Race::Terran, 0, 0, 1, 0, true, false, false, false, false, false, false, sc2::ABILITY_ID::TRAIN_REAPER, 0, { UnitType(sc2::UNIT_TYPEID::TERRAN_BARRACKS, m_bot) }, {}, {} };
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::TERRAN_SCV, m_bot)] =                      { sc2::Race::Terran, 0, 0, 1, 0, true, false,  true, false, false, false, false, sc2::ABILITY_ID::TRAIN_SCV, 0, { UnitType(sc2::UNIT_TYPEID::TERRAN_COMMANDCENTER, m_bot) }, {}, {} }; 
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::TERRAN_SIEGETANK, m_bot)] =                { sc2::Race::Terran, 0, 0, 3, 0, true, false, false, false, false, false, false, sc2::ABILITY_ID::TRAIN_SIEGETANK, 0, { UnitType(sc2::UNIT_TYPEID::TERRAN_FACTORY, m_bot) }, { UnitType(sc2::UNIT_TYPEID::TERRAN_TECHLAB, m_bot), UnitType(sc2::UNIT_TYPEID::TERRAN_BARRACKSTECHLAB, m_bot), UnitType(sc2::UNIT_TYPEID::TERRAN_FACTORYTECHLAB, m_bot), UnitType(sc2::UNIT_TYPEID::TERRAN_STARPORTTECHLAB, m_bot) }, {} };
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::TERRAN_THOR, m_bot)] =                     { sc2::Race::Terran, 0, 0, 6, 0, true, false, false, false, false, false, false, sc2::ABILITY_ID::TRAIN_THOR, 0, { UnitType(sc2::UNIT_TYPEID::TERRAN_FACTORY, m_bot) }, {}, {} };  
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::TERRAN_VIKINGFIGHTER, m_bot)] =            { sc2::Race::Terran, 0, 0, 2, 0, true, false, false, false, false, false, false, sc2::ABILITY_ID::TRAIN_VIKINGFIGHTER, 0, { UnitType(sc2::UNIT_TYPEID::TERRAN_STARPORT, m_bot) }, {}, {} }; 
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::TERRAN_WIDOWMINE, m_bot)] =                { sc2::Race::Terran, 0, 0, 2, 0, true, false, false, false, false, false, false, sc2::ABILITY_ID::TRAIN_WIDOWMINE, 0, { UnitType(sc2::UNIT_TYPEID::TERRAN_FACTORY, m_bot) }, {}, {} }; 
+    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::TERRAN_ORBITALCOMMANDFLYING, m_bot)] =     m_unitTypeData[UnitType(sc2::UNIT_TYPEID::TERRAN_ORBITALCOMMAND, m_bot)];
 
-    // Zerg Buildings                                                                      m  g  s  t  unit  bld   wrk    rfn    sup    hall   add
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::ZERG_BANELINGNEST, m_bot)] =               { sc2::Race::Zerg, 0, 0, 0, 0, true, true, false, false, false, false, false, sc2::ABILITY_ID::BUILD_BANELINGNEST, 0, { UnitType(sc2::UNIT_TYPEID::ZERG_DRONE, m_bot) }, { UnitType(sc2::UNIT_TYPEID::ZERG_SPAWNINGPOOL, m_bot) }, {} };
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::ZERG_CREEPTUMOR, m_bot)] =                 { sc2::Race::Zerg, 0, 0, 0, 0, true, true, false, false, false,  true, false, sc2::ABILITY_ID::BUILD_CREEPTUMOR, 0, { UnitType(sc2::UNIT_TYPEID::ZERG_CREEPTUMORQUEEN, m_bot) }, {}, {} };  
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::ZERG_CREEPTUMORQUEEN, m_bot)] =            { sc2::Race::Zerg, 0, 0, 0, 0, true, true, false, false, false,  true, false, sc2::ABILITY_ID::BUILD_CREEPTUMOR_QUEEN, 0, { UnitType(sc2::UNIT_TYPEID::ZERG_QUEEN, m_bot) }, {}, {} };  
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::ZERG_EVOLUTIONCHAMBER, m_bot)] =           { sc2::Race::Zerg, 0, 0, 0, 0, true, true, false, false, false, false, false, sc2::ABILITY_ID::BUILD_EVOLUTIONCHAMBER, 0, { UnitType(sc2::UNIT_TYPEID::ZERG_DRONE, m_bot) }, { UnitType(sc2::UNIT_TYPEID::ZERG_HATCHERY, m_bot), UnitType(sc2::UNIT_TYPEID::ZERG_LAIR, m_bot), UnitType(sc2::UNIT_TYPEID::ZERG_HIVE, m_bot) }, {} };
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::ZERG_EXTRACTOR, m_bot)] =                  { sc2::Race::Zerg, 0, 0, 0, 0, true, true, false,  true, false, false, false, sc2::ABILITY_ID::BUILD_EXTRACTOR, 0, { UnitType(sc2::UNIT_TYPEID::ZERG_DRONE, m_bot) }, {}, {} }; 
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::ZERG_GREATERSPIRE, m_bot)] =               { sc2::Race::Zerg, 0, 0, 0, 0, true, true, false, false, false, false, false, sc2::ABILITY_ID::MORPH_GREATERSPIRE, 0, { UnitType(sc2::UNIT_TYPEID::ZERG_SPIRE, m_bot) }, { UnitType(sc2::UNIT_TYPEID::ZERG_HIVE, m_bot) }, {} }; 
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::ZERG_HATCHERY, m_bot)] =                   { sc2::Race::Zerg, 0, 0, 0, 0, true, true, false, false, false,  true, false, sc2::ABILITY_ID::BUILD_HATCHERY, 0, { UnitType(sc2::UNIT_TYPEID::ZERG_DRONE, m_bot) }, {}, {} }; 
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::ZERG_HIVE, m_bot)] =                       { sc2::Race::Zerg, 0, 0, 0, 0, true, true, false, false, false,  true, false, sc2::ABILITY_ID::MORPH_HIVE, 0, { UnitType(sc2::UNIT_TYPEID::ZERG_LAIR, m_bot) }, { UnitType(sc2::UNIT_TYPEID::ZERG_INFESTATIONPIT, m_bot) }, {} };  
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::ZERG_HYDRALISKDEN, m_bot)] =               { sc2::Race::Zerg, 0, 0, 0, 0, true, true, false, false, false, false, false, sc2::ABILITY_ID::BUILD_HYDRALISKDEN, 0, { UnitType(sc2::UNIT_TYPEID::ZERG_DRONE, m_bot) }, { UnitType(sc2::UNIT_TYPEID::ZERG_LAIR, m_bot), UnitType(sc2::UNIT_TYPEID::ZERG_HIVE, m_bot) }, {} };
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::ZERG_INFESTATIONPIT, m_bot)] =             { sc2::Race::Zerg, 0, 0, 0, 0, true, true, false, false, false, false, false, sc2::ABILITY_ID::BUILD_INFESTATIONPIT, 0, { UnitType(sc2::UNIT_TYPEID::ZERG_DRONE, m_bot) }, { UnitType(sc2::UNIT_TYPEID::ZERG_LAIR, m_bot), UnitType(sc2::UNIT_TYPEID::ZERG_HIVE, m_bot) }, {} };
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::ZERG_LAIR, m_bot)] =                       { sc2::Race::Zerg, 0, 0, 0, 0, true, true, false, false, false,  true, false, sc2::ABILITY_ID::MORPH_LAIR, 0, { UnitType(sc2::UNIT_TYPEID::ZERG_HATCHERY, m_bot) }, {UnitType(sc2::UNIT_TYPEID::ZERG_SPAWNINGPOOL, m_bot)}, {} };
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::ZERG_LURKERDENMP, m_bot)] =                { sc2::Race::Zerg, 0, 0, 0, 0, true, true, false, false, false,  true, false, sc2::ABILITY_ID::MORPH_LURKERDEN, 0, { UnitType(sc2::UNIT_TYPEID::ZERG_DRONE, m_bot) }, { UnitType(sc2::UNIT_TYPEID::ZERG_HYDRALISKDEN, m_bot) }, {} };
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::ZERG_NYDUSCANAL, m_bot)] =                 { sc2::Race::Zerg, 0, 0, 0, 0, true, true, false, false, false, false, false, sc2::ABILITY_ID::BUILD_NYDUSWORM, 0, { UnitType(sc2::UNIT_TYPEID::ZERG_DRONE, m_bot) }, { UnitType(sc2::UNIT_TYPEID::ZERG_NYDUSNETWORK, m_bot) }, {} };
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::ZERG_NYDUSNETWORK, m_bot)] =               { sc2::Race::Zerg, 0, 0, 0, 0, true, true, false, false, false, false, false, sc2::ABILITY_ID::BUILD_NYDUSNETWORK, 0, { UnitType(sc2::UNIT_TYPEID::ZERG_DRONE, m_bot) }, { UnitType(sc2::UNIT_TYPEID::ZERG_LAIR, m_bot), UnitType(sc2::UNIT_TYPEID::ZERG_HIVE, m_bot) }, {} };
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::ZERG_ROACHWARREN, m_bot)] =                { sc2::Race::Zerg, 0, 0, 0, 0, true, true, false, false, false, false, false, sc2::ABILITY_ID::BUILD_ROACHWARREN, 0, { UnitType(sc2::UNIT_TYPEID::ZERG_DRONE, m_bot) }, { UnitType(sc2::UNIT_TYPEID::ZERG_SPAWNINGPOOL, m_bot) }, {} };
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::ZERG_SPAWNINGPOOL, m_bot)] =               { sc2::Race::Zerg, 0, 0, 0, 0, true, true, false, false, false, false, false, sc2::ABILITY_ID::BUILD_SPAWNINGPOOL, 0, { UnitType(sc2::UNIT_TYPEID::ZERG_DRONE, m_bot) }, { UnitType(sc2::UNIT_TYPEID::ZERG_HATCHERY, m_bot), UnitType(sc2::UNIT_TYPEID::ZERG_LAIR, m_bot), UnitType(sc2::UNIT_TYPEID::ZERG_HIVE, m_bot) }, {} };
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::ZERG_SPINECRAWLER, m_bot)] =               { sc2::Race::Zerg, 0, 0, 0, 0, true, true, false, false, false, false, false, sc2::ABILITY_ID::BUILD_SPINECRAWLER, 0, { UnitType(sc2::UNIT_TYPEID::ZERG_DRONE, m_bot) }, { UnitType(sc2::UNIT_TYPEID::ZERG_SPAWNINGPOOL, m_bot) }, {} };
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::ZERG_SPIRE, m_bot)] =                      { sc2::Race::Zerg, 0, 0, 0, 0, true, true, false, false, false, false, false, sc2::ABILITY_ID::BUILD_SPIRE, 0, { UnitType(sc2::UNIT_TYPEID::ZERG_DRONE, m_bot) }, { UnitType(sc2::UNIT_TYPEID::ZERG_LAIR, m_bot), UnitType(sc2::UNIT_TYPEID::ZERG_HIVE, m_bot) }, {} };
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::ZERG_SPORECRAWLER, m_bot)] =               { sc2::Race::Zerg, 0, 0, 0, 0, true, true, false, false, false, false, false, sc2::ABILITY_ID::BUILD_SPORECRAWLER, 0, { UnitType(sc2::UNIT_TYPEID::ZERG_DRONE, m_bot) }, { UnitType(sc2::UNIT_TYPEID::ZERG_SPAWNINGPOOL, m_bot) }, {} };
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::ZERG_ULTRALISKCAVERN, m_bot)] =            { sc2::Race::Zerg, 0, 0, 0, 0, true, true, false, false, false, false, false, sc2::ABILITY_ID::BUILD_ULTRALISKCAVERN, 0, { UnitType(sc2::UNIT_TYPEID::ZERG_DRONE, m_bot) }, { UnitType(sc2::UNIT_TYPEID::ZERG_HIVE, m_bot) }, {} };
+    // Terran Units
+    
 
-    // Zerg Units                                                                          m  g  s  t  unit  bld    wrk    rfn    sup    hall   add
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::ZERG_BANELING, m_bot)] =                   { sc2::Race::Zerg, 0, 0, 0, 0, true, false, false, false, false, false, false, sc2::ABILITY_ID::TRAIN_BANELING, 0, { UnitType(sc2::UNIT_TYPEID::ZERG_LARVA, m_bot) }, { UnitType(sc2::UNIT_TYPEID::ZERG_BANELINGNEST, m_bot) }, {} }; 
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::ZERG_BROODLING, m_bot)] =                  { sc2::Race::Zerg, 0, 0, 0, 0, true, false, false, false, false, false, false, 0, 0, { UnitType() }, {}, {} };
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::ZERG_BROODLORD, m_bot)] =                  { sc2::Race::Zerg, 0, 0, 4, 0, true, false, false, false, false, false, false, sc2::ABILITY_ID::MORPH_BROODLORD, 0, { UnitType(sc2::UNIT_TYPEID::ZERG_CORRUPTOR, m_bot) }, { UnitType(sc2::UNIT_TYPEID::ZERG_GREATERSPIRE, m_bot) }, {} };
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::ZERG_CHANGELING, m_bot)] =                 { sc2::Race::Zerg, 0, 0, 0, 0, true, false, false, false, false, false, false, sc2::ABILITY_ID::EFFECT_SPAWNCHANGELING, 0, { UnitType(sc2::UNIT_TYPEID::ZERG_OVERSEER, m_bot) }, {}, {} };
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::ZERG_CHANGELINGMARINE, m_bot)] =           { sc2::Race::Zerg, 0, 0, 0, 0, true, false, false, false, false, false, false, 0, 0, { UnitType() }, {}, {} };
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::ZERG_CHANGELINGMARINESHIELD, m_bot)] =     { sc2::Race::Zerg, 0, 0, 0, 0, true, false, false, false, false, false, false, 0, 0, { UnitType() }, {}, {} };
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::ZERG_CHANGELINGZEALOT, m_bot)] =           { sc2::Race::Zerg, 0, 0, 0, 0, true, false, false, false, false, false, false, 0, 0, { UnitType() }, {}, {} };
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::ZERG_CHANGELINGZERGLING, m_bot)] =         { sc2::Race::Zerg, 0, 0, 0, 0, true, false, false, false, false, false, false, 0, 0, { UnitType() }, {}, {} };
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::ZERG_CHANGELINGZERGLINGWINGS, m_bot)] =    { sc2::Race::Zerg, 0, 0, 0, 0, true, false, false, false, false, false, false, 0, 0, { UnitType() }, {}, {} };
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::ZERG_CORRUPTOR, m_bot)] =                  { sc2::Race::Zerg, 0, 0, 2, 0, true, false, false, false, false, false, false, sc2::ABILITY_ID::TRAIN_CORRUPTOR, 0, { UnitType(sc2::UNIT_TYPEID::ZERG_LARVA, m_bot) }, { UnitType(sc2::UNIT_TYPEID::ZERG_SPIRE, m_bot), UnitType(sc2::UNIT_TYPEID::ZERG_GREATERSPIRE, m_bot) }, {} };
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::ZERG_DRONE, m_bot)] =                      { sc2::Race::Zerg, 0, 0, 1, 0, true, false, false, false, false, false, false, sc2::ABILITY_ID::TRAIN_DRONE, 0, { UnitType(sc2::UNIT_TYPEID::ZERG_LARVA, m_bot) }, {}, {} }; 
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::ZERG_EGG, m_bot)] =                        { sc2::Race::Zerg, 0, 0, 2, 0, true, false, false, false, false, false, false, 0, 0, { UnitType() }, {}, {} };
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::ZERG_HYDRALISK, m_bot)] =                  { sc2::Race::Zerg, 0, 0, 2, 0, true, false, false, false, false, false, false, sc2::ABILITY_ID::TRAIN_HYDRALISK, 0, { UnitType(sc2::UNIT_TYPEID::ZERG_LARVA, m_bot) }, { UnitType(sc2::UNIT_TYPEID::ZERG_HYDRALISKDEN, m_bot) }, {} };
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::ZERG_INFESTOR, m_bot)] =                   { sc2::Race::Zerg, 0, 0, 2, 0, true, false, false, false, false, false, false, sc2::ABILITY_ID::TRAIN_INFESTOR, 0, { UnitType(sc2::UNIT_TYPEID::ZERG_LARVA, m_bot) }, { UnitType(sc2::UNIT_TYPEID::ZERG_INFESTATIONPIT, m_bot) }, {} };
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::ZERG_INFESTORTERRAN, m_bot)] =             { sc2::Race::Zerg, 0, 0, 0, 0, true, false, false, false, false, false, false, sc2::ABILITY_ID::EFFECT_INFESTEDTERRANS, 0, { UnitType(sc2::UNIT_TYPEID::ZERG_INFESTOR, m_bot) }, {}, {} };
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::ZERG_LARVA, m_bot)] =                      { sc2::Race::Zerg, 0, 0, 2, 0, true, false, false, false, false, false, false, 0, 0, { UnitType() }, {}, {} };
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::ZERG_LURKERMP, m_bot)] =                   { sc2::Race::Zerg, 0, 0, 0, 0, true, false, false, false, false, false, false, sc2::ABILITY_ID::MORPH_LURKER, 0, { UnitType(sc2::UNIT_TYPEID::ZERG_HYDRALISK, m_bot) }, { UnitType(sc2::UNIT_TYPEID::ZERG_LURKERDENMP, m_bot) }, {} };
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::ZERG_MUTALISK, m_bot)] =                   { sc2::Race::Zerg, 0, 0, 2, 0, true, false, false, false, false, false, false, sc2::ABILITY_ID::TRAIN_MUTALISK, 0, { UnitType(sc2::UNIT_TYPEID::ZERG_LARVA, m_bot) }, { UnitType(sc2::UNIT_TYPEID::ZERG_SPIRE, m_bot), UnitType(sc2::UNIT_TYPEID::ZERG_GREATERSPIRE, m_bot) }, {} };
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::ZERG_OVERLORD, m_bot)] =                   { sc2::Race::Zerg, 0, 0, 0, 0, true, false, false, false,  true, false, false, sc2::ABILITY_ID::TRAIN_OVERLORD, 0, { UnitType(sc2::UNIT_TYPEID::ZERG_LARVA, m_bot) }, {}, {} }; 
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::ZERG_OVERSEER, m_bot)] =                   { sc2::Race::Zerg, 0, 0, -8, 0, true, false, false, false, false, false, false, sc2::ABILITY_ID::MORPH_OVERSEER, 0, { UnitType(sc2::UNIT_TYPEID::ZERG_OVERLORD, m_bot) }, { UnitType(sc2::UNIT_TYPEID::ZERG_LAIR, m_bot), UnitType(sc2::UNIT_TYPEID::ZERG_HIVE, m_bot) }, {} };
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::ZERG_QUEEN, m_bot)] =                      { sc2::Race::Zerg, 0, 0, 2, 0, true, false, false, false, false, false, false, sc2::ABILITY_ID::TRAIN_QUEEN, 0, { UnitType(sc2::UNIT_TYPEID::ZERG_HATCHERY, m_bot), UnitType(sc2::UNIT_TYPEID::ZERG_LAIR, m_bot), UnitType(sc2::UNIT_TYPEID::ZERG_HIVE, m_bot) }, { UnitType(sc2::UNIT_TYPEID::ZERG_SPAWNINGPOOL, m_bot) }, {} };
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::ZERG_RAVAGER, m_bot)] =                    { sc2::Race::Zerg, 0, 0, 0, 0, true, false, false, false, false, false, false, sc2::ABILITY_ID::MORPH_RAVAGER, 0, { UnitType(sc2::UNIT_TYPEID::ZERG_ROACH, m_bot) }, { UnitType(sc2::UNIT_TYPEID::ZERG_ROACHWARREN, m_bot) }, {} };
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::ZERG_ROACH, m_bot)] =                      { sc2::Race::Zerg, 0, 0, 2, 0, true, false, false, false, false, false, false, sc2::ABILITY_ID::TRAIN_ROACH, 0, { UnitType(sc2::UNIT_TYPEID::ZERG_LARVA, m_bot) }, { UnitType(sc2::UNIT_TYPEID::ZERG_ROACHWARREN, m_bot) }, {} };
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::ZERG_SWARMHOSTMP, m_bot)] =                { sc2::Race::Zerg, 0, 0, 3, 0, true, false, false, false, false, false, false, sc2::ABILITY_ID::TRAIN_SWARMHOST, 0, { UnitType(sc2::UNIT_TYPEID::ZERG_LARVA, m_bot) }, { UnitType(sc2::UNIT_TYPEID::ZERG_INFESTATIONPIT, m_bot) }, {} };
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::ZERG_ULTRALISK, m_bot)] =                  { sc2::Race::Zerg, 0, 0, 6, 0, true, false, false, false, false, false, false, sc2::ABILITY_ID::TRAIN_ULTRALISK, 0, { UnitType(sc2::UNIT_TYPEID::ZERG_LARVA, m_bot) }, { UnitType(sc2::UNIT_TYPEID::ZERG_ULTRALISKCAVERN, m_bot) }, {} };
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::ZERG_VIPER, m_bot)] =                      { sc2::Race::Zerg, 0, 0, 3, 0, true, false, false, false, false, false, false, sc2::ABILITY_ID::TRAIN_VIPER, 0, { UnitType(sc2::UNIT_TYPEID::ZERG_LARVA, m_bot) }, { UnitType(sc2::UNIT_TYPEID::ZERG_HIVE, m_bot) }, {} };
-    m_unitTypeData[UnitType(sc2::UNIT_TYPEID::ZERG_ZERGLING, m_bot)] =                   { sc2::Race::Zerg, 0, 0, 1, 0, true, false, false, false, false, false, false, sc2::ABILITY_ID::TRAIN_ZERGLING, 0, { UnitType(sc2::UNIT_TYPEID::ZERG_LARVA, m_bot) }, { UnitType(sc2::UNIT_TYPEID::ZERG_SPAWNINGPOOL, m_bot) }, {} };
+    // Zerg Buildings
+ 
 
-    // Set the Mineral / Gas cost of each unit
-    for (auto & kv : m_unitTypeData)
-    {
-        if (!kv.first.isValid()) { continue; }
-        
-        auto & data = m_bot.Observation()->GetUnitTypeData()[kv.first.getAPIUnitType()];
-                
-        kv.second.mineralCost = data.mineral_cost;
-        kv.second.gasCost     = data.vespene_cost;
-    }
+    // Zerg Units
+
 
     // fix the cumulative prices of morphed buildings
     m_unitTypeData[UnitType(sc2::UNIT_TYPEID::ZERG_HIVE, m_bot)].mineralCost -= getData(UnitType(sc2::UNIT_TYPEID::ZERG_LAIR, m_bot)).mineralCost;
