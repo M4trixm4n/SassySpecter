@@ -13,6 +13,8 @@
 #include "TechTree.h"
 #include "MetaType.h"
 #include "Unit.h"
+#include "BattleSimulation.h"
+
 
 #ifdef SC2API
 class SassySpecterBot : public sc2::Agent 
@@ -28,6 +30,7 @@ class SassySpecterBot
     BotConfig               m_config;
     TechTree                m_techTree;
     GameCommander           m_gameCommander;
+    BattleSimulation        m_simulation;
 
     std::vector<Unit>       m_allUnits;
     std::vector<CCPosition> m_baseLocations;
@@ -46,6 +49,7 @@ public:
 #ifdef SC2API
     void OnGameStart() override;
     void OnStep() override;
+    void OnUnitDestroyed(const sc2::Unit *unit) override;
 #else
     void OnGameStart();
     void OnStep();

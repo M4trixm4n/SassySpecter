@@ -32,8 +32,8 @@ struct TypeData
 class TechTree
 {
     SassySpecterBot & m_bot;
-    std::map<UnitType, TypeData>  m_unitTypeData;
     std::map<CCUpgrade, TypeData> m_upgradeData;
+    std::map<UnitType, TypeData>  m_unitTypeData;
 
     void initUnitTypeData();
     void initUpgradeData();
@@ -48,4 +48,5 @@ public:
     const TypeData & getData(const UnitType & type) const;
     const TypeData & getData(const CCUpgrade & type) const;
     const TypeData & getData(const MetaType & type) const;
+    const std::map<UnitType, TypeData> & getAllUnits () const;
 };

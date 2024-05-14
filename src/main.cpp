@@ -7,6 +7,7 @@
 
 #include "sc2utils/sc2_manage_process.h"
 #include "sc2api/sc2_api.h"
+#include "DummyBot.h"
 
 int main(int argc, char* argv[]) 
 {
@@ -60,6 +61,7 @@ int main(int argc, char* argv[])
 
     // Add the custom bot, it will control the player.
     SassySpecterBot bot;
+    DummyBot dummy;
 
     
     // WARNING: Bot logic has not been thoroughly tested on step sizes > 1
@@ -68,9 +70,13 @@ int main(int argc, char* argv[])
     coordinator.SetStepSize(stepSize);
     coordinator.SetRealtime(false);
 
-    coordinator.SetParticipants({
+    /*coordinator.SetParticipants({
         sc2::CreateParticipant(Util::GetRaceFromString(botRaceString), &bot),
         sc2::CreateComputer(Util::GetRaceFromString(enemyRaceString), enemyDifficulty)
+    });*/
+    coordinator.SetParticipants({
+        sc2::CreateParticipant(Util::GetRaceFromString(botRaceString), &bot),
+        sc2::CreateParticipant(Util::GetRaceFromString(enemyRaceString), &dummy)
     });
 
     // Start the game.

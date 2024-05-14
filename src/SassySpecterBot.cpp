@@ -1,5 +1,4 @@
 #include "SassySpecterBot.h"
-#include "Util.h"
 #include <iostream>
 
 SassySpecterBot::SassySpecterBot()
@@ -10,27 +9,14 @@ SassySpecterBot::SassySpecterBot()
     , m_gameCommander(*this)
     , m_strategy(*this)
     , m_techTree(*this)
+    , m_simulation(*this, m_techTree)
 {
     
 }
 
 void SassySpecterBot::OnGameStart() 
-{
+{    
     m_config.readConfigFile();
-    //for (auto &unit : Observation()->GetUnitTypeData()) {
-    //    if (unit.movement_speed == 0) continue;
-    //    std::cout << unit.name << " : " << std::endl;
-    //    std::cout << "Disponible : " << (unit.available ? "oui" : "non") << std::endl;
-    //    std::cout << "Race : " << unit.race << std::endl;
-    //    std::cout << "Cout : " << unit.mineral_cost << "  " << unit.vespene_cost << "  " << unit.food_required << "  " << unit.build_time << std::endl;
-    //    std::cout << "Attributes : \n";
-    //    for (auto &att : unit.attributes) {
-    //        std::cout << static_cast<int>(att) << std::endl;
-    //    }
-    //    std::cout << "Movement Speed : " << unit.movement_speed << std::endl;
-    //    std::cout << "Requirements : " << unit.tech_requirement << std::endl;
-    //    std::cout << "Requirement is an add-on : " << unit.require_attached << std::endl;
-    //}
 
     // add all the possible start locations on the map
 #ifdef SC2API
@@ -62,13 +48,15 @@ void SassySpecterBot::OnGameStart()
     
     setUnits();
     m_techTree.onStart();
-    m_strategy.onStart();
+    //m_strategy.onStart();
     m_map.onStart();
     m_unitInfo.onStart();
     m_bases.onStart();
     m_workers.onStart();
 
-    m_gameCommander.onStart();
+    //m_gameCommander.onStart();
+    m_simulation.onStart();
+    Control()->GetObservation();
 }
 
 void SassySpecterBot::OnStep()
@@ -78,20 +66,24 @@ void SassySpecterBot::OnStep()
     m_unitInfo.onFrame();
     m_bases.onFrame();
     m_workers.onFrame();
-    m_strategy.onFrame();
+    //m_strategy.onFrame();
 
-    m_gameCommander.onFrame();
+    //m_gameCommander.onFrame();s
+    m_simulation.onFrame();
 
 #ifdef SC2API
     Debug()->SendDebug();
 #endif
 }
 
+void SassySpecterBot::OnUnitDestroyed (const sc2::Unit *unit) {
+    m_simulation.onUnitDestroyed(unit);
+}
+
 void SassySpecterBot::setUnits()
 {
     m_allUnits.clear();
 #ifdef SC2API
-    Control()->GetObservation();
     for (auto & unit : Observation()->GetUnits())
     {
         m_allUnits.push_back(Unit(unit, *this));    

@@ -78,13 +78,21 @@ CCRace UnitType::getRace() const
 #endif
 }
 
+
+bool UnitType::canAttack() const {
+    return m_bot->Observation()->GetUnitTypeData()[m_type].weapons.size();
+}
+
+bool UnitType::canMove() const {
+    return m_bot->Observation()->GetUnitTypeData()[m_type].movement_speed != 0.0f;
+}
+
 bool UnitType::isCombatUnit() const
 {
 #ifdef SC2API
     if (isWorker()) { return false; }
     if (isSupplyProvider()) { return false; }
     if (isBuilding()) { return false; }
-
     if (isEgg() || isLarva()) { return false; }
 
     return true;
@@ -215,6 +223,50 @@ bool UnitType::isWorker() const
 #else
     return m_type.isWorker();
 #endif
+}
+
+bool UnitType::isChangeling() const {
+    switch (m_type.ToType()) {
+        case sc2::UNIT_TYPEID::ZERG_CHANGELING:
+        case sc2::UNIT_TYPEID::ZERG_CHANGELINGMARINE:
+        case sc2::UNIT_TYPEID::ZERG_CHANGELINGMARINESHIELD:
+        case sc2::UNIT_TYPEID::ZERG_CHANGELINGZEALOT:
+        case sc2::UNIT_TYPEID::ZERG_CHANGELINGZERGLING:
+        case sc2::UNIT_TYPEID::ZERG_CHANGELINGZERGLINGWINGS: 
+            return true;
+        default: return false;
+    }
+}
+
+bool UnitType::isAirUnit () const {
+    switch (m_type.ToType()) {
+        case sc2::UNIT_TYPEID::PROTOSS_OBSERVER:
+        case sc2::UNIT_TYPEID::PROTOSS_WARPPRISM:
+        case sc2::UNIT_TYPEID::PROTOSS_PHOENIX:
+        case sc2::UNIT_TYPEID::PROTOSS_VOIDRAY:
+        case sc2::UNIT_TYPEID::PROTOSS_CARRIER:
+        case sc2::UNIT_TYPEID::PROTOSS_INTERCEPTOR:
+        case sc2::UNIT_TYPEID::PROTOSS_MOTHERSHIP:
+        case sc2::UNIT_TYPEID::PROTOSS_MOTHERSHIPCORE:
+        case sc2::UNIT_TYPEID::PROTOSS_ORACLE:
+        case sc2::UNIT_TYPEID::PROTOSS_TEMPEST:
+        case sc2::UNIT_TYPEID::TERRAN_MEDIVAC:
+        case sc2::UNIT_TYPEID::TERRAN_VIKINGFIGHTER:
+        case sc2::UNIT_TYPEID::TERRAN_BANSHEE:
+        case sc2::UNIT_TYPEID::TERRAN_RAVEN:
+        case sc2::UNIT_TYPEID::TERRAN_BATTLECRUISER:
+        case sc2::UNIT_TYPEID::TERRAN_POINTDEFENSEDRONE:
+        case sc2::UNIT_TYPEID::TERRAN_LIBERATOR:
+        case sc2::UNIT_TYPEID::ZERG_OVERLORD:
+        case sc2::UNIT_TYPEID::ZERG_OVERSEER:
+        case sc2::UNIT_TYPEID::ZERG_MUTALISK:
+        case sc2::UNIT_TYPEID::ZERG_CORRUPTOR:
+        case sc2::UNIT_TYPEID::ZERG_BROODLORD:
+        case sc2::UNIT_TYPEID::ZERG_VIPER:
+            return true;
+        default:
+            return false;
+    }
 }
 
 CCPositionType UnitType::getAttackRange() const
@@ -446,6 +498,7 @@ std::vector<UnitType> UnitType::whatBuilds() const {
             return {UnitType(UNIT_TYPEID::PROTOSS_PROBE, *m_bot)};
         
         case UNIT_TYPEID::PROTOSS_WARPGATE:
+        case UNIT_TYPEID::PROTOSS_SHIELDBATTERY:
             return {UnitType(UNIT_TYPEID::PROTOSS_GATEWAY, *m_bot)};
         
         case UNIT_TYPEID::PROTOSS_ADEPT:
@@ -622,6 +675,7 @@ std::vector<UnitType> UnitType::whatBuilds() const {
         case UNIT_TYPEID::ZERG_SWARMHOSTBURROWEDMP:
         case UNIT_TYPEID::TERRAN_WIDOWMINEBURROWED:
         case UNIT_TYPEID::ZERG_LURKERMPBURROWED:
+        case UNIT_TYPEID::ZERG_ULTRALISKBURROWED:
         case UNIT_TYPEID::ZERG_SPINECRAWLERUPROOTED: // ignore uprooted
         case UNIT_TYPEID::ZERG_SPORECRAWLERUPROOTED:
         case UNIT_TYPEID::NEUTRAL_FORCEFIELD: // no idea what it is
@@ -629,6 +683,7 @@ std::vector<UnitType> UnitType::whatBuilds() const {
         case UNIT_TYPEID::NEUTRAL_UTILITYBOT:
         case UNIT_TYPEID::ZERG_PARASITICBOMBDUMMY:
         case UNIT_TYPEID::TERRAN_KD8CHARGE:
+        case UNIT_TYPEID::TERRAN_PREVIEWBUNKERUPGRADED:
         case UNIT_TYPEID::TERRAN_SIEGETANKSIEGED:       //abilities to morph aren't stored in the unit's information, can't actually get this unit with the current implementation
         case UNIT_TYPEID::TERRAN_VIKINGASSAULT:         
         case UNIT_TYPEID::PROTOSS_WARPPRISMPHASING:
@@ -637,6 +692,11 @@ std::vector<UnitType> UnitType::whatBuilds() const {
         case UNIT_TYPEID::PROTOSS_DISRUPTORPHASED:
         case UNIT_TYPEID::TERRAN_LIBERATORAG:
         case UNIT_TYPEID::PROTOSS_ADEPTPHASESHIFT:
+        case UNIT_TYPEID::PROTOSS_OBSERVERSIEGEMODE:
+        case UNIT_TYPEID::ZERG_OVERSEERSIEGEMODE:
+        case UNIT_TYPEID::TERRAN_REFINERYRICH:
+        case UNIT_TYPEID::PROTOSS_ASSIMILATORRICH:
+        case UNIT_TYPEID::ZERG_EXTRACTORRICH:
         case UNIT_TYPEID::NEUTRAL_RICHMINERALFIELD: // uncraftable / already on the map
         case UNIT_TYPEID::NEUTRAL_RICHMINERALFIELD750:
         case UNIT_TYPEID::NEUTRAL_XELNAGATOWER:
@@ -668,6 +728,17 @@ std::vector<UnitType> UnitType::whatBuilds() const {
         case UNIT_TYPEID::NEUTRAL_LABMINERALFIELD:
         case UNIT_TYPEID::NEUTRAL_LABMINERALFIELD750:
         case UNIT_TYPEID::PROTOSS_PYLONOVERCHARGED:
+        case UNIT_TYPEID::NEUTRAL_RICHVESPENEGEYSER:
+        case UNIT_TYPEID::NEUTRAL_DESTRUCTIBLECITYDEBRIS6X6:
+        case UNIT_TYPEID::NEUTRAL_PURIFIERRICHMINERALFIELD:
+        case UNIT_TYPEID::NEUTRAL_PURIFIERRICHMINERALFIELD750:
+        case UNIT_TYPEID::NEUTRAL_PURIFIERVESPENEGEYSER:
+        case UNIT_TYPEID::NEUTRAL_SHAKURASVESPENEGEYSER:
+        case UNIT_TYPEID::NEUTRAL_PURIFIERMINERALFIELD:
+        case UNIT_TYPEID::NEUTRAL_PURIFIERMINERALFIELD750:
+        case UNIT_TYPEID::NEUTRAL_BATTLESTATIONMINERALFIELD:
+        case UNIT_TYPEID::NEUTRAL_BATTLESTATIONMINERALFIELD750:
+        case UNIT_TYPEID::NEUTRAL_MINERALFIELD450:
             return {UnitType()};
 
         case UNIT_TYPEID::ZERG_BROODLORD:
