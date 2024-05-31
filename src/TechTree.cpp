@@ -47,6 +47,7 @@ void TechTree::initUnitTypeData()
             {UnitType(unit.tech_requirement, m_bot)},
             {}  //TODO
         };
+        m_unitFromAbility[unit.ability_id] = unit.unit_type_id;
     }
     m_unitTypeData[UnitType(0, m_bot)] = TypeData();
 
@@ -248,6 +249,10 @@ const TypeData & TechTree::getData(const MetaType & type) const
     BOT_ASSERT(false, "Can't getData this type: %s", type.getName().c_str());
 
     return m_unitTypeData.begin()->second;
+}
+
+const sc2::UNIT_TYPEID TechTree::getUnit (sc2::ABILITY_ID id) const {
+    return m_unitFromAbility.at(id);
 }
 
 const std::map<UnitType, TypeData> & TechTree::getAllUnits () const {

@@ -73,7 +73,11 @@ std::vector<float> Army::getDPSCoef (const Army *enemy) const {
  */
 bool Army::winsAgainst (const Army *enemy) const {
     if (!canFight(enemy)) return false; //1st
-    return enemy->totalHealth()/armyDPS(getDPSCoef(enemy)) < totalHealth()/enemy->armyDPS(enemy->getDPSCoef(this));
+    return enemy->totalHealth()/armyScore(enemy) < totalHealth()/enemy->armyScore(this);
+}
+
+double Army::armyScore (const Army *enemy) const {
+    return armyDPS(getDPSCoef(enemy));
 }
 
 void Army::spawnArmy (sc2::Point2D pos, int pID) {
@@ -100,7 +104,11 @@ bool Army::contains (sc2::UNIT_TYPEID unit) const {
 
 void Army::addBattalion (Battalion bat) {
     if (contains(bat.unitType)) {
-        std::cout << "An army cannot contain 2 Battalions with the same unit\n";
+        for (auto &batt : battalions) {
+            if (batt.unitType == bat.unitType) {
+                batt.incrementUnit(bat.getCount());
+            }
+        }
         return;
     }
     battalions.push_back(bat);
@@ -113,6 +121,18 @@ void Battalion::decrementUnit () {
 void Army::deadUnit (const sc2::Unit *unit) {
     for (int i = 0; i < battalions.size(); i++) {
         if (battalions[i].unitType == unit->unit_type) {
+            battalions[i].decrementUnit();
+            if (battalions[i].isEmpty()) {
+                battalions.erase(battalions.begin() + i);
+                i--;
+            }
+        }
+    }
+}
+
+void Army::deadUnit (const sc2::UNIT_TYPEID unit) {
+    for (int i = 0; i < battalions.size(); i++) {
+        if (battalions[i].unitType == unit) {
             battalions[i].decrementUnit();
             if (battalions[i].isEmpty()) {
                 battalions.erase(battalions.begin() + i);
@@ -223,4 +243,92 @@ void Army::fillBattalionStats (int pID, float health, float shield, sc2::UNIT_TY
             bat.shield = shield;
         }
     }
+}
+
+void Battalion::incrementUnit () {
+    count++;
+}
+
+void Battalion::incrementUnit (int inc) {
+    for (int i = 0; i < inc; i++) count++;
+}
+
+void Army::addUnit (const sc2::Unit *unit, SassySpecterBot &bot) {
+    for (auto &bat : battalions) {
+        if (bat.unitType == unit->unit_type) {
+            bat.incrementUnit();
+            return;
+        }
+    }
+    addBattalion(Battalion(unit->unit_type, 1, &bot));
+}
+
+void Army::addUnit (const sc2::UNIT_TYPEID unit, SassySpecterBot &bot) {
+    for (auto &bat : battalions) {
+        if (bat.unitType == unit) {
+            bat.incrementUnit();
+            return;
+        }
+    }
+    addBattalion(Battalion(unit, 1, &bot));
+}
+
+int Army::size () const {
+    int res{0};
+    for (auto &bat : battalions) {
+        res += bat.getCount();
+    }
+    return res;
+}
+
+int Battalion::getCount () const {
+    return count;
+}
+
+int Battalion::mineralCost () const {
+    return m_bot->Data(UnitType(unitType, *m_bot)).mineralCost * count;
+}
+
+int Battalion::vespeneCost () const {
+    return m_bot->Data(UnitType(unitType, *m_bot)).gasCost * count;
+}
+
+int Battalion::foodCost () const {
+    return m_bot->Data(UnitType(unitType, *m_bot)).supplyCost * count;
+}
+
+int Army::mineralCost () const {
+    int res{0};
+    for (auto &bat : battalions) {
+        res += bat.mineralCost();
+    }
+    return res;
+}
+
+int Army::vespeneCost () const {
+    int res{0};
+    for (auto &bat : battalions) {
+        res += bat.vespeneCost();
+    }
+    return res;
+}
+
+int Army::foodCost () const {
+    int res{0};
+    for (auto &bat : battalions) {
+        res += bat.foodCost();
+    }
+    return res;
+}
+
+Army * Army::copyWithAdditions (Army *additions) const {
+    Army *res = new Army(battalions);
+    for (auto &bat : additions->battalions) {
+        res->addBattalion(bat);
+    }
+    return res;
+}
+
+Army * Army::copy () const {
+    return new Army(battalions);
 }

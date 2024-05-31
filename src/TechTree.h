@@ -34,6 +34,7 @@ class TechTree
     SassySpecterBot & m_bot;
     std::map<CCUpgrade, TypeData> m_upgradeData;
     std::map<UnitType, TypeData>  m_unitTypeData;
+    std::map<sc2::ABILITY_ID, sc2::UNIT_TYPEID> m_unitFromAbility;
 
     void initUnitTypeData();
     void initUpgradeData();
@@ -48,5 +49,6 @@ public:
     const TypeData & getData(const UnitType & type) const;
     const TypeData & getData(const CCUpgrade & type) const;
     const TypeData & getData(const MetaType & type) const;
+    const sc2::UNIT_TYPEID getUnit (sc2::ABILITY_ID id) const;
     const std::map<UnitType, TypeData> & getAllUnits () const;
 };

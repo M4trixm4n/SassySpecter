@@ -71,4 +71,5 @@ public:
 
     sc2::AbilityID warpAbility() const;
     bool equivalentBuilding () const; //checks if the building is equivalent to another (and thus just copied later)
+    static std::vector<sc2::UNIT_TYPEID> trainableUnits ();
 };

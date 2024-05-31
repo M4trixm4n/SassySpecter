@@ -14,6 +14,7 @@
 #include "MetaType.h"
 #include "Unit.h"
 #include "BattleSimulation.h"
+#include "UnitSelector.h"
 
 
 #ifdef SC2API
@@ -31,6 +32,7 @@ class SassySpecterBot
     TechTree                m_techTree;
     GameCommander           m_gameCommander;
     BattleSimulation        m_simulation;
+    UnitSelector            m_unitSelector;
 
     std::vector<Unit>       m_allUnits;
     std::vector<CCPosition> m_baseLocations;
@@ -50,6 +52,8 @@ public:
     void OnGameStart() override;
     void OnStep() override;
     void OnUnitDestroyed(const sc2::Unit *unit) override;
+    void OnUnitCreated(const sc2::Unit *unit) override;
+    void OnUnitEnterVision(const sc2::Unit *unit) override;
 #else
     void OnGameStart();
     void OnStep();
@@ -65,6 +69,7 @@ public:
     const TypeData & Data(const CCUpgrade & type) const;
     const TypeData & Data(const MetaType & type) const;
     const TypeData & Data(const Unit & unit) const;
+    const sc2::UNIT_TYPEID getUnitFromAbility (sc2::ABILITY_ID id) const;
     CCRace GetPlayerRace(int player) const;
     CCPosition GetStartLocation() const;
 

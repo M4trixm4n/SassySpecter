@@ -20,11 +20,17 @@ public:
     double battalionDPS () const;
     void spawnBattalion (sc2::Point2D pos, int playerID) const;
     void decrementUnit ();
+    void incrementUnit ();
+    void incrementUnit (int inc);
     bool isEmpty () const;
     bool canTarget (const Battalion &bat) const;
     float bonusCoef (Battalion enemy) const;
     float totalHealth () const;
     sc2::Race getRace () const;
+    int getCount () const;
+    int mineralCost () const;
+    int vespeneCost () const;
+    int foodCost () const;
 };
 
 struct Army {
@@ -48,6 +54,9 @@ public:
     void addBattalion (Battalion bat);
     bool contains (sc2::UNIT_TYPEID unit) const;
     void deadUnit (const sc2::Unit *unit);
+    void deadUnit (const sc2::UNIT_TYPEID unit);
+    void addUnit (const sc2::Unit *unit, SassySpecterBot &bot);
+    void addUnit (const sc2::UNIT_TYPEID unit, SassySpecterBot &bot);
     bool isEmpty () const;
     bool winsAgainst (Army &enemy) const;
     bool winsAgainst (const Army *enemy) const;
@@ -55,4 +64,11 @@ public:
     sc2::Race getRace () const;
     void fillBattalionStats (int pID, float health, float shield, sc2::UNIT_TYPEID unit);
     float totalHealth () const;
+    int size () const;
+    int mineralCost () const;
+    int vespeneCost () const;
+    int foodCost () const;
+    double armyScore (const Army *enemy) const;
+    Army *copyWithAdditions (Army *additions) const;
+    Army *copy () const;
 };

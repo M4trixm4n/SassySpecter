@@ -239,12 +239,12 @@ bool MapTools::isExplored(const CCPosition & pos) const
 
 bool MapTools::isExplored(int tileX, int tileY) const
 {
-    if (!isValidTile(tileX, m_height - tileY)) {
+    if (!isValidTile(tileX, tileY)) {
         return false; 
     }
 
 #ifdef SC2API
-    sc2::Visibility vis = m_bot.Observation()->GetVisibility(CCPosition(tileX + HALF_TILE, m_height - tileY + HALF_TILE));
+    sc2::Visibility vis = m_bot.Observation()->GetVisibility(CCPosition(tileX + HALF_TILE, tileY + HALF_TILE));
     return vis == sc2::Visibility::Fogged || vis == sc2::Visibility::Visible;
 #else
     return BWAPI::Broodwar->isExplored(tileX, tileY);
@@ -256,7 +256,7 @@ bool MapTools::isVisible(int tileX, int tileY) const
     if (!isValidTile(tileX, tileY)) { return false; }
 
 #ifdef SC2API
-    return m_bot.Observation()->GetVisibility(CCPosition(tileX + HALF_TILE, m_height - tileY + HALF_TILE)) == sc2::Visibility::Visible;
+    return m_bot.Observation()->GetVisibility(CCPosition(tileX + HALF_TILE, tileY + HALF_TILE)) == sc2::Visibility::Visible;
 #else
     return BWAPI::Broodwar->isVisible(BWAPI::TilePosition(tileX, tileY));
 #endif

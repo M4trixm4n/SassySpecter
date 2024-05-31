@@ -174,6 +174,7 @@ void BuildingManager::constructAssignedBuildings()
             // if we haven't explored the build position, go there
             if (!isBuildingPositionExplored(b))
             {
+                std::cout << "Not explored again\n";
                 builderUnit.move(b.finalPosition);
             }
             // if this is not the first time we've sent this guy to build this
