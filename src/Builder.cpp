@@ -4,8 +4,8 @@
 #include "ObjectiveFunction.h"
 
 Builder::Builder (SassySpecterBot &bot, 
-                  std::vector<UnitSelector::Building_> *allyBuildings,
                   std::vector<UnitSelector::Building_> *freeBuildings,
+                  std::map<sc2::UNIT_TYPEID, int> *trainableUnitsLimit,
                   Army *ally,
                   Army *enemyArmy,
                   Army *enemyAdditions,
@@ -14,8 +14,8 @@ Builder::Builder (SassySpecterBot &bot,
                   int foodAvailable,
                   int unitsInTraining):
     m_bot(bot),
-    _allyBuildings(allyBuildings),
     _freeBuildings(freeBuildings),
+    _trainableUnitsLimit(trainableUnitsLimit),
     _ally(ally),
     _enemyArmy(enemyArmy),
     _enemyAdditions(enemyAdditions),
@@ -26,14 +26,13 @@ Builder::Builder (SassySpecterBot &bot,
 {}
 
 void Builder::declare_variables() {
-    for (auto &unit : UnitType::trainableUnits()) {
-        variables.emplace_back(0, 5, std::to_string(static_cast<int>(unit)));
+    for (std::map<sc2::UNIT_TYPEID, int>::iterator it = _trainableUnitsLimit->begin(); it != _trainableUnitsLimit->end(); it++) {
+        variables.emplace_back(0, it->second, std::to_string(static_cast<int>(it->first)));
     }
 }
 
 void Builder::declare_constraints() {
     constraints.push_back(make_shared<UnitLimit>(variables, _ally, _unitsInTraining));
-    constraints.push_back(make_shared<SameRace>(variables));
     constraints.push_back(make_shared<FreeBuildings>(variables, _freeBuildings));
     constraints.push_back(make_shared<RessourceCost>(variables, _minerals, _vespene, _foodAvailable, m_bot));
 }

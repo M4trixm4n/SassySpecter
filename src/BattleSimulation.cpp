@@ -54,6 +54,7 @@ void BattleSimulation::onFrame () {
         else if (command == ":setbatmaxsize") setBattalionMaximumSize(std::stoi(mess.message.substr(mess.message.find(" "))));
         else if (command == ":setnumbattle") setNumberOfBattles(std::stoi(mess.message.substr(mess.message.find(" "))));
         else if (command == ":starttest") startTesting();
+        else if (command == ":ghost") startGhost();
     }
 }
 
@@ -214,4 +215,8 @@ battleEnded:
         clean(true);
     }
     return true;
+}
+
+void BattleSimulation::startGhost () {
+    m_bot.unitSelectorOnStep();
 }

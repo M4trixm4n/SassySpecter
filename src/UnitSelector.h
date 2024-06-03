@@ -3,7 +3,7 @@
 #include <sc2api/sc2_unit.h>
 
 class SassySpecterBot;
-class Army;
+struct Army;
 
 class UnitSelector {
 
@@ -47,6 +47,7 @@ public:
     void removeBuilding (const sc2::Unit *unit);
     void updateRessources ();
     std::vector<Building_> * freeUnitBuildings ();
+    std::map<sc2::UNIT_TYPEID, int> *trainableUnitsLimit ();
 
     UnitSelector (SassySpecterBot &bot);
 

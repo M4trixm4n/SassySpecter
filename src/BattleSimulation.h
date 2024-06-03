@@ -43,6 +43,7 @@ private:
     void setNumberOfBattles (int nb);
     void singleBattle ();
     void startTesting ();
+    void startGhost ();
     sc2::UNIT_TYPEID chooseUnit (Army done);
     Army* generateArmy (int index);
     bool checkBattleEnded ();

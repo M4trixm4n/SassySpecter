@@ -45,16 +45,65 @@ void UnitSelector::onFrame () {
 }
 
 void UnitSelector::onStep () {
-    //using namespace ghost;
+    updateRessources();
+    std::map<sc2::UNIT_TYPEID, int> *unitsLimit = trainableUnitsLimit();
+    //Builder builder (   m_bot,
+    //                    freeUnitBuildings(),
+    //                    unitsLimit,
+    //                    ally,
+    //                    enemyArmy,
+    //                    enemyAdditions,     //need to predict this
+    //                    minerals,
+    //                    vespene,
+    //                    foodAvailable,
+    //                    unitsInTraining);
+    Army *a1 = new Army({
+        Battalion(sc2::UNIT_TYPEID::TERRAN_BANSHEE, 4, &m_bot),
+        Battalion(sc2::UNIT_TYPEID::TERRAN_GHOST, 6, &m_bot),
+        Battalion(sc2::UNIT_TYPEID::TERRAN_MARINE, 10, &m_bot),
+        Battalion(sc2::UNIT_TYPEID::TERRAN_REAPER, 1, &m_bot)
+                        });
+    Army *a2 = new Army({
+        Battalion(sc2::UNIT_TYPEID::PROTOSS_ADEPT, 4, &m_bot),
+        Battalion(sc2::UNIT_TYPEID::PROTOSS_IMMORTAL, 8, &m_bot),
+        Battalion(sc2::UNIT_TYPEID::PROTOSS_HIGHTEMPLAR, 7, &m_bot),
+        Battalion(sc2::UNIT_TYPEID::PROTOSS_MOTHERSHIP, 1, &m_bot),
+        Battalion(sc2::UNIT_TYPEID::PROTOSS_TEMPEST, 3, &m_bot)
+                        });
+    std::vector<Building_> *b = new std::vector<Building_>();
+    b->push_back({sc2::UNIT_TYPEID::TERRAN_COMMANDCENTER, 0, {{sc2::ABILITY_ID::TRAIN_SCV, sc2::UNIT_TYPEID::TERRAN_SCV}}});
+    b->push_back({sc2::UNIT_TYPEID::TERRAN_BARRACKS, 0, {{sc2::ABILITY_ID::TRAIN_GHOST, sc2::UNIT_TYPEID::TERRAN_GHOST}, {sc2::ABILITY_ID::TRAIN_MARINE, sc2::UNIT_TYPEID::TERRAN_MARINE}, {sc2::ABILITY_ID::TRAIN_REAPER, sc2::UNIT_TYPEID::TERRAN_REAPER}, {sc2::ABILITY_ID::TRAIN_MARAUDER, sc2::UNIT_TYPEID::TERRAN_MARAUDER}}});
+    b->push_back({sc2::UNIT_TYPEID::TERRAN_BARRACKS, 0, {{sc2::ABILITY_ID::TRAIN_GHOST, sc2::UNIT_TYPEID::TERRAN_GHOST}, {sc2::ABILITY_ID::TRAIN_MARINE, sc2::UNIT_TYPEID::TERRAN_MARINE}, {sc2::ABILITY_ID::TRAIN_REAPER, sc2::UNIT_TYPEID::TERRAN_REAPER}, {sc2::ABILITY_ID::TRAIN_MARAUDER, sc2::UNIT_TYPEID::TERRAN_MARAUDER}}});
+    b->push_back({sc2::UNIT_TYPEID::TERRAN_BARRACKS, 0, {{sc2::ABILITY_ID::TRAIN_GHOST, sc2::UNIT_TYPEID::TERRAN_GHOST}, {sc2::ABILITY_ID::TRAIN_MARINE, sc2::UNIT_TYPEID::TERRAN_MARINE}, {sc2::ABILITY_ID::TRAIN_REAPER, sc2::UNIT_TYPEID::TERRAN_REAPER}, {sc2::ABILITY_ID::TRAIN_MARAUDER, sc2::UNIT_TYPEID::TERRAN_MARAUDER}}});
+    b->push_back({sc2::UNIT_TYPEID::TERRAN_BARRACKS, 0, {{sc2::ABILITY_ID::TRAIN_GHOST, sc2::UNIT_TYPEID::TERRAN_GHOST}, {sc2::ABILITY_ID::TRAIN_MARINE, sc2::UNIT_TYPEID::TERRAN_MARINE}, {sc2::ABILITY_ID::TRAIN_REAPER, sc2::UNIT_TYPEID::TERRAN_REAPER}, {sc2::ABILITY_ID::TRAIN_MARAUDER, sc2::UNIT_TYPEID::TERRAN_MARAUDER}}});
+    b->push_back({sc2::UNIT_TYPEID::TERRAN_BARRACKS, 0, {{sc2::ABILITY_ID::TRAIN_GHOST, sc2::UNIT_TYPEID::TERRAN_GHOST}, {sc2::ABILITY_ID::TRAIN_MARINE, sc2::UNIT_TYPEID::TERRAN_MARINE}, {sc2::ABILITY_ID::TRAIN_REAPER, sc2::UNIT_TYPEID::TERRAN_REAPER}, {sc2::ABILITY_ID::TRAIN_MARAUDER, sc2::UNIT_TYPEID::TERRAN_MARAUDER}}});
+    b->push_back({sc2::UNIT_TYPEID::TERRAN_FACTORY, 0, {{sc2::ABILITY_ID::TRAIN_CYCLONE, sc2::UNIT_TYPEID::TERRAN_CYCLONE}, {sc2::ABILITY_ID::TRAIN_HELLION, sc2::UNIT_TYPEID::TERRAN_HELLION}, {sc2::ABILITY_ID::TRAIN_SIEGETANK, sc2::UNIT_TYPEID::TERRAN_SIEGETANK}, {sc2::ABILITY_ID::TRAIN_THOR, sc2::UNIT_TYPEID::TERRAN_THOR}}});
+    b->push_back({sc2::UNIT_TYPEID::TERRAN_FACTORY, 0, {{sc2::ABILITY_ID::TRAIN_CYCLONE, sc2::UNIT_TYPEID::TERRAN_CYCLONE}, {sc2::ABILITY_ID::TRAIN_HELLION, sc2::UNIT_TYPEID::TERRAN_HELLION}, {sc2::ABILITY_ID::TRAIN_SIEGETANK, sc2::UNIT_TYPEID::TERRAN_SIEGETANK}, {sc2::ABILITY_ID::TRAIN_THOR, sc2::UNIT_TYPEID::TERRAN_THOR}}});
+    b->push_back({sc2::UNIT_TYPEID::TERRAN_STARPORT, 0, {{sc2::ABILITY_ID::TRAIN_BANSHEE, sc2::UNIT_TYPEID::TERRAN_BANSHEE}, {sc2::ABILITY_ID::TRAIN_BATTLECRUISER, sc2::UNIT_TYPEID::TERRAN_BATTLECRUISER}, {sc2::ABILITY_ID::TRAIN_LIBERATOR, sc2::UNIT_TYPEID::TERRAN_LIBERATOR}, {sc2::ABILITY_ID::TRAIN_VIKINGFIGHTER, sc2::UNIT_TYPEID::TERRAN_VIKINGFIGHTER}}});
+    b->push_back({sc2::UNIT_TYPEID::TERRAN_STARPORT, 0, {{sc2::ABILITY_ID::TRAIN_BANSHEE, sc2::UNIT_TYPEID::TERRAN_BANSHEE}, {sc2::ABILITY_ID::TRAIN_BATTLECRUISER, sc2::UNIT_TYPEID::TERRAN_BATTLECRUISER}, {sc2::ABILITY_ID::TRAIN_LIBERATOR, sc2::UNIT_TYPEID::TERRAN_LIBERATOR}, {sc2::ABILITY_ID::TRAIN_VIKINGFIGHTER, sc2::UNIT_TYPEID::TERRAN_VIKINGFIGHTER}}});
+    unitsLimit = new std::map<sc2::UNIT_TYPEID, int>();
+    unitsLimit->insert({sc2::UNIT_TYPEID::TERRAN_SCV, 1});
+    unitsLimit->insert({sc2::UNIT_TYPEID::TERRAN_GHOST, 5});
+    unitsLimit->insert({sc2::UNIT_TYPEID::TERRAN_MARINE, 5});
+    unitsLimit->insert({sc2::UNIT_TYPEID::TERRAN_REAPER, 5});
+    unitsLimit->insert({sc2::UNIT_TYPEID::TERRAN_MARAUDER, 5});
+    unitsLimit->insert({sc2::UNIT_TYPEID::TERRAN_CYCLONE, 2});
+    unitsLimit->insert({sc2::UNIT_TYPEID::TERRAN_HELLION, 2});
+    unitsLimit->insert({sc2::UNIT_TYPEID::TERRAN_SIEGETANK, 2});
+    unitsLimit->insert({sc2::UNIT_TYPEID::TERRAN_THOR, 2});
+    unitsLimit->insert({sc2::UNIT_TYPEID::TERRAN_BANSHEE, 2});
+    unitsLimit->insert({sc2::UNIT_TYPEID::TERRAN_BATTLECRUISER, 2});
+    unitsLimit->insert({sc2::UNIT_TYPEID::TERRAN_LIBERATOR, 2});
+    unitsLimit->insert({sc2::UNIT_TYPEID::TERRAN_VIKINGFIGHTER, 2});
     Builder builder (   m_bot,
-                        &allyBuildings,
                         freeUnitBuildings(),
-                        ally,
-                        enemyArmy,
+                        unitsLimit,
+                        a1,
+                        a2,
                         enemyAdditions,     //need to predict this
-                        minerals,
-                        vespene,
-                        foodAvailable,
+                        1000,
+                        150,
+                        40,
                         unitsInTraining);
 
     Options options;
@@ -66,7 +115,18 @@ void UnitSelector::onStep () {
     vector<int> vec_solution;
     double cost;
 
-    if (solver.fast_search(cost, vec_solution, 90ms, options)) std::cout << "Solution found\n";
+    if (solver.fast_search(cost, vec_solution, 100ms, options)) std::cout << "Solution found\n";
+    else {
+        std::cout << "Error in the solver\n";
+        return;
+    }
+    int i = 0;
+    for (std::map<sc2::UNIT_TYPEID, int>::iterator it = unitsLimit->begin(); it != unitsLimit->end(); it++) {
+        allyAdditions->addBattalion(Battalion(it->first, vec_solution[i++], &m_bot));
+    }
+    std::cout << "Additional units : \n";
+    allyAdditions->Log();
+
 }
 
 void UnitSelector::onUnitDestroyed (const sc2::Unit *unit) {
@@ -158,6 +218,17 @@ bool UnitSelector::C_objectiveUsefulness (Army *enemyCopy) {
 
 bool UnitSelector::C_affordable () {
     return ally->mineralCost() <= minerals && ally->vespeneCost() <= vespene && ally->foodCost() <= foodAvailable;
+}
+
+std::map<sc2::UNIT_TYPEID, int> *UnitSelector::trainableUnitsLimit () {
+    std::map<sc2::UNIT_TYPEID, int> *list = new std::map<sc2::UNIT_TYPEID, int>();
+    for (auto &build : *freeUnitBuildings()) {
+        for (auto &ability : build.trainingAbilities) {
+            if (list->find(ability.second) == list->end()) (*list)[ability.second] = 1;
+            else (*list)[ability.second]++;
+        }
+    }
+    return list;
 }
 
 

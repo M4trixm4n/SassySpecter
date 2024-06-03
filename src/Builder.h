@@ -13,8 +13,8 @@ using namespace ghost;
 class Builder: public ModelBuilder {
 
     SassySpecterBot &m_bot;
-	std::vector<UnitSelector::Building_> *_allyBuildings;
 	std::vector<UnitSelector::Building_> *_freeBuildings;
+    std::map<sc2::UNIT_TYPEID, int> *_trainableUnitsLimit;
     Army *_ally;                             // ally army
     Army *_enemyArmy;                        // enemy units we've seen
     Army *_enemyAdditions;                   // what we think the enemy army contains, excluding what we've already seen
@@ -26,8 +26,8 @@ class Builder: public ModelBuilder {
 public:
 
 	Builder (SassySpecterBot &bot,
-             std::vector<UnitSelector::Building_> *allyBuildings,
              std::vector<UnitSelector::Building_> *freeBuildings,
+             std::map<sc2::UNIT_TYPEID, int> *trainableUnitsLimit,
              Army *ally,
              Army *enemyArmy,
              Army *enemyAdditions,

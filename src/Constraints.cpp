@@ -44,16 +44,3 @@ double FreeBuildings::required_error (const vector<Variable*> &variables) const 
     }
     return error;
 }
-
-double SameRace::required_error (const vector<Variable*> &variables) const {
-    vector<int> counts{};
-    for (auto &var : variables) {
-        if (!var->get_value()) continue;
-        if (var->get_name().rfind("PROTOSS_", 0) == 0) counts[0] += var->get_value();
-        else if (var->get_name().rfind("TERRAN_", 0) == 0) counts[1] += var->get_value();
-        else if (var->get_name().rfind("ZERG_", 0) == 0) counts[2] += var->get_value();
-    }
-    sort(counts.begin(), counts.end());
-    reverse(counts.begin(), counts.end());
-    return counts[1] + counts[2];
-}

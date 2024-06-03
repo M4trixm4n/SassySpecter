@@ -49,13 +49,13 @@ void SassySpecterBot::OnGameStart()
     
     setUnits();
     m_techTree.onStart();
-    m_strategy.onStart(); // Comment for simulation
+    //m_strategy.onStart(); // Comment for simulation
     m_map.onStart();
     m_unitInfo.onStart();
     m_bases.onStart();
     m_workers.onStart();
 
-    m_gameCommander.onStart(); // Comment for simulation
+    //m_gameCommander.onStart(); // Comment for simulation
     m_simulation.onStart();
     m_unitSelector.onStart();
     Control()->GetObservation();
@@ -68,9 +68,9 @@ void SassySpecterBot::OnStep()
     m_unitInfo.onFrame();
     m_bases.onFrame();
     m_workers.onFrame();
-    m_strategy.onFrame(); // Comment for simulation
+    //m_strategy.onFrame(); // Comment for simulation
 
-    m_gameCommander.onFrame(); // Comment for simulation
+    //m_gameCommander.onFrame(); // Comment for simulation
     m_simulation.onFrame();
 
 #ifdef SC2API
@@ -89,6 +89,10 @@ void SassySpecterBot::OnUnitCreated (const sc2::Unit *unit) {
 
 void SassySpecterBot::OnUnitEnterVision(const sc2::Unit *unit) {
     m_unitSelector.onUnitEnterVision(unit);
+}
+
+void SassySpecterBot::unitSelectorOnStep () {
+    m_unitSelector.onStep();
 }
 
 void SassySpecterBot::setUnits()

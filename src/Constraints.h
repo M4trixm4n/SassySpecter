@@ -67,14 +67,3 @@ public:
         : Constraint(variables),
           freeBuildings(freeBuildings) {}
 };
-
-/*
-* All chosen units must be from the same race
-*/
-class SameRace: public Constraint {
-
-    double required_error(const vector<Variable*> &variables) const override;
-
-public:
-    SameRace (const std::vector<Variable> &variables) : Constraint(variables) {}
-};
