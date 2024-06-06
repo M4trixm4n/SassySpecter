@@ -115,7 +115,7 @@ void UnitSelector::onStep () {
     vector<int> vec_solution;
     double cost;
 
-    if (solver.fast_search(cost, vec_solution, 100ms, options)) std::cout << "Solution found\n";
+    if (solver.fast_search(cost, vec_solution, 90ms, options)) std::cout << "Solution found\n";
     else {
         std::cout << "Error in the solver\n";
         return;

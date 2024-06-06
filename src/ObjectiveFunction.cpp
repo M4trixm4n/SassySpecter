@@ -3,6 +3,7 @@
 double BestAdditions::required_cost (const vector<Variable*> &variables) const {
     Army *additions = new Army();
     for (auto &var : variables) {
+        if (!var->get_value()) continue;
         additions->addBattalion(Battalion(static_cast<sc2::UNIT_TYPEID>(stoi(var->get_name())), var->get_value(), &m_bot));
     }
     Army *allyCopy = _ally->copyWithAdditions(additions);
